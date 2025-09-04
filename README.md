@@ -282,17 +282,8 @@ sudo systemctl restart redis
 ## 📈 Roadmap y Mejoras Futuras
 
 ### Fase 2 (Próximas Versiones)
-- [ ] Integración con sistemas ERP
-- [ ] Módulo de nómina y remuneraciones
-- [ ] App móvil para empleados
-- [ ] Integración con dispositivos IoT
-- [ ] Machine Learning para predicciones
 
 ### Fase 3 (Versiones Avanzadas)
-- [ ] Analytics avanzados con Big Data
-- [ ] Integración con sistemas de inventario
-- [ ] Módulo de capacitación y desarrollo
-- [ ] Sistema de reconocimientos y gamificación
 
 ## 🤝 Contribución
 
@@ -309,29 +300,13 @@ sudo systemctl restart redis
 - Escribir tests para nuevas funcionalidades
 - Mantener cobertura de código > 80%
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
 ## 👥 Autores
 
-- **Desarrollador**: [Tu Nombre]
-- **Tesis**: "Diseño e Implementación de una Aplicación Web de Gestión y Evaluación de Personal en el Área de Logística para la Optimización de la Productividad Empresarial"
-- **Universidad**: [Nombre de la Universidad]
-- **Año**: 2024
+- **Desarrollador**: Jaime Oróstegui y Jazmín Duarte
+- **Universidad**: DuocUC
+- **Año**: 2025
 
-## 📞 Contacto
-
-- **Email**: [tu-email@ejemplo.com]
-- **LinkedIn**: [tu-linkedin]
-- **GitHub**: [tu-github]
-
-## 🙏 Agradecimientos
-
-- Django Community por el framework excepcional
-- HackSoftware por el Django Styleguide
-- Comunidad de desarrolladores Python
-- Profesores y asesores de tesis
 
 ---
 

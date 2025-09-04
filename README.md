@@ -3,7 +3,7 @@
 ## 📚 Documentación de Capstone
 
 <details>
-<summary><strong>📋 FASE 1:</strong></summary>
+<summary><strong>📋 FASE 1</strong></summary>
 
 ### Documentos:
 - [ ] [Documentos Jaime Oróstegui(https://drive.google.com/drive/folders/1ne2evcziajIVGcPaMr8kAxXZri1Cnetz?usp=sharing)]
@@ -13,12 +13,12 @@
 </details>
 
 <details>
-<summary><strong>💻 FASE 2: [Título de la Fase]</strong></summary>
+<summary><strong>💻 FASE 2</strong></summary>
 
 </details>
 
 <details>
-<summary><strong>🎨 FASE 3: [Título de la Fase]</strong></summary>
+<summary><strong>🎨 FASE 3</strong></summary>
 
 </details>
 

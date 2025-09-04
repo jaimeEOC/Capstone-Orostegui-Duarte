@@ -279,6 +279,88 @@ sudo systemctl restart celery
 sudo systemctl restart redis
 ```
 
+## 📚 Documentación de Tesis
+
+<details>
+<summary><strong>📋 FASE 1: [Título de la Fase]</strong></summary>
+
+### Documentos:
+- [ ] [Documento 1](./docs/fase1/)
+- [ ] [Documento 2](./docs/fase1/)
+- [ ] [Documento 3](./docs/fase1/)
+- [ ] [Documento 4](./docs/fase1/)
+
+### Entregables:
+- [ ] [Entregable 1]
+- [ ] [Entregable 2]
+- [ ] [Entregable 3]
+
+</details>
+
+<details>
+<summary><strong>💻 FASE 2: [Título de la Fase]</strong></summary>
+
+### Documentos:
+- [ ] [Documento 1](./docs/fase2/)
+- [ ] [Documento 2](./docs/fase2/)
+- [ ] [Documento 3](./docs/fase2/)
+- [ ] [Documento 4](./docs/fase2/)
+
+### Entregables:
+- [ ] [Entregable 1]
+- [ ] [Entregable 2]
+- [ ] [Entregable 3]
+
+</details>
+
+<details>
+<summary><strong>🎨 FASE 3: [Título de la Fase]</strong></summary>
+
+### Documentos:
+- [ ] [Documento 1](./docs/fase3/)
+- [ ] [Documento 2](./docs/fase3/)
+- [ ] [Documento 3](./docs/fase3/)
+- [ ] [Documento 4](./docs/fase3/)
+
+### Entregables:
+- [ ] [Entregable 1]
+- [ ] [Entregable 2]
+- [ ] [Entregable 3]
+
+</details>
+
+<details>
+<summary><strong>🧪 FASE 4: [Título de la Fase]</strong></summary>
+
+### Documentos:
+- [ ] [Documento 1](./docs/fase4/)
+- [ ] [Documento 2](./docs/fase4/)
+- [ ] [Documento 3](./docs/fase4/)
+- [ ] [Documento 4](./docs/fase4/)
+
+### Entregables:
+- [ ] [Entregable 1]
+- [ ] [Entregable 2]
+- [ ] [Entregable 3]
+
+</details>
+
+<details>
+<summary><strong>📊 FASE 5: [Título de la Fase]</strong></summary>
+
+### Documentos:
+- [ ] [Documento 1](./docs/fase5/)
+- [ ] [Documento 2](./docs/fase5/)
+- [ ] [Documento 3](./docs/fase5/)
+- [ ] [Documento 4](./docs/fase5/)
+
+### Entregables:
+- [ ] [Entregable 1]
+- [ ] [Entregable 2]
+- [ ] [Entregable 3]
+
+</details>
+
 ## 📈 Roadmap y Mejoras Futuras
 
 ### Fase 2 (Próximas Versiones)

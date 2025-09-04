@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Logistica HR{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Dashboard</h1>
+            <p class="text-muted">Resumen general del sistema de gestión de personal</p>
+        </div>
+        <div>
+            <span class="badge bg-success fs-6">Sistema Activo</span>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">156</h4>
+                        <p class="mb-0 opacity-75">Empleados Activos</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">89</h4>
+                        <p class="mb-0 opacity-75">Tareas Pendientes</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-tasks fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">94.2%</h4>
+                        <p class="mb-0 opacity-75">Productividad</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">12</h4>
+                        <p class="mb-0 opacity-75">Reportes Hoy</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-file-alt fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row">
+        <!-- Recent Activity -->
+        <div class="col-lg-8 mb-4">
+            <div class="card card-dashboard">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock me-2 text-primary"></i>
+                        Actividad Reciente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user-plus text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Nuevo empleado registrado</h6>
+                                <p class="text-muted mb-0">Carlos Mendoza se unió al equipo de almacén</p>
+                                <small class="text-muted">Hace 2 horas</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-check text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Tarea completada</h6>
+                                <p class="text-muted mb-0">Inventario mensual finalizado por María González</p>
+                                <small class="text-muted">Hace 4 horas</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-exclamation-triangle text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Alerta de rendimiento</h6>
+                                <p class="text-muted mb-0">Equipo de carga reporta retrasos en despacho</p>
+                                <small class="text-muted">Hace 6 horas</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-file-alt text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">Reporte generado</h6>
+                                <p class="text-muted mb-0">Reporte de productividad semanal disponible</p>
+                                <small class="text-muted">Hace 1 día</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card card-dashboard">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2 text-warning"></i>
+                        Acciones Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Agregar Empleado
+                        </a>
+                        <a href="#" class="btn btn-outline-success">
+                            <i class="fas fa-tasks me-2"></i>
+                            Nueva Tarea
+                        </a>
+                        <a href="#" class="btn btn-outline-info">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Ver Reportes
+                        </a>
+                        <a href="#" class="btn btn-outline-warning">
+                            <i class="fas fa-cog me-2"></i>
+                            Configuración
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="card card-dashboard mt-3">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-server me-2 text-info"></i>
+                        Estado del Sistema
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Base de Datos</span>
+                        <span class="badge bg-success">Activo</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>API REST</span>
+                        <span class="badge bg-success">Activo</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Procesamiento</span>
+                        <span class="badge bg-success">Activo</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Backup</span>
+                        <span class="badge bg-warning">Pendiente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Chart Placeholder -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-dashboard">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-area me-2 text-success"></i>
+                        Rendimiento del Equipo (Últimos 7 días)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Gráfico de rendimiento se mostrará aquí</p>
+                        <small class="text-muted">Integración con Chart.js en desarrollo</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

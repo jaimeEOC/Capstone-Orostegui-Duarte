@@ -1,0 +1,18 @@
+# Dependencias mínimas para Windows - Logistica HR
+# Solo lo esencial para que funcione el proyecto
+
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+python-decouple==3.8
+django-filter==23.5
+django-extensions==3.2.3
+whitenoise==6.6.0
+django-celery-beat==2.5.0
+django-celery-results==2.5.1
+celery==5.3.4
+redis==5.0.1
+
+# Nota: Pillow se puede instalar después si es necesario
+
+

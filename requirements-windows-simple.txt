@@ -1,0 +1,18 @@
+# Dependencias simplificadas para Windows - Logistica HR
+# Versiones compatibles que funcionan sin problemas de compilación
+
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+python-decouple==3.8
+Pillow
+django-filter==23.5
+django-extensions==3.2.3
+whitenoise==6.6.0
+
+# Notas:
+# - Pillow se instala sin versión específica para usar la más compatible
+# - Se omiten Celery y Redis para desarrollo simple
+# - Se omiten dependencias que pueden causar problemas en Windows
+
+

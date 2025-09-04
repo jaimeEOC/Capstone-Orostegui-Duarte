@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes - Logistica HR{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Gestión de Reportes</h1>
+            <p class="text-muted">Genera y administra reportes de rendimiento y productividad</p>
+        </div>
+        <div>
+            <button class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                Nuevo Reporte
+            </button>
+        </div>
+    </div>
+
+    <!-- Report Types -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card card-dashboard text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                    <h5>Reportes de Rendimiento</h5>
+                    <p class="text-muted">Análisis de productividad del personal</p>
+                    <button class="btn btn-outline-primary btn-sm">Generar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card card-dashboard text-center">
+                <div class="card-body">
+                    <i class="fas fa-tasks fa-3x text-success mb-3"></i>
+                    <h5>Reportes de Tareas</h5>
+                    <p class="text-muted">Estado y progreso de actividades</p>
+                    <button class="btn btn-outline-success btn-sm">Generar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card card-dashboard text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                    <h5>Reportes de Personal</h5>
+                    <p class="text-muted">Información de empleados y departamentos</p>
+                    <button class="btn btn-outline-warning btn-sm">Generar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card card-dashboard text-center">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                    <h5>Reportes de Tiempo</h5>
+                    <p class="text-muted">Análisis de horarios y asistencia</p>
+                    <button class="btn btn-outline-info btn-sm">Generar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card card-dashboard mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" placeholder="Buscar reportes...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option>Tipo de Reporte</option>
+                        <option>Rendimiento</option>
+                        <option>Tareas</option>
+                        <option>Personal</option>
+                        <option>Tiempo</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option>Período</option>
+                        <option>Diario</option>
+                        <option>Semanal</option>
+                        <option>Mensual</option>
+                        <option>Trimestral</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" value="2025-08-28">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtrar
+                    </button>
+                    <button class="btn btn-outline-danger">
+                        <i class="fas fa-times me-2"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="card card-dashboard">
+        <div class="card-header bg-transparent border-0">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-file-alt me-2 text-primary"></i>
+                Reportes Generados
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Reporte</th>
+                            <th>Tipo</th>
+                            <th>Período</th>
+                            <th>Generado por</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>REP001</td>
+                            <td>
+                                <div>
+                                    <h6 class="mb-1">Reporte de Productividad Semanal</h6>
+                                    <small class="text-muted">Análisis del 19-25 de Agosto 2025</small>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-primary">Rendimiento</span></td>
+                            <td>Semanal</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <span>Admin</span>
+                                </div>
+                            </td>
+                            <td>25 Ago 2025</td>
+                            <td><span class="badge bg-success">Completado</span></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>REP002</td>
+                            <td>
+                                <div>
+                                    <h6 class="mb-1">Análisis de Tareas por Departamento</h6>
+                                    <small class="text-muted">Estado de actividades del mes de Agosto</small>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-success">Tareas</span></td>
+                            <td>Mensual</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <span>Supervisor</span>
+                                </div>
+                            </td>
+                            <td>28 Ago 2025</td>
+                            <td><span class="badge bg-warning">En Proceso</span></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-pause"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>REP003</td>
+                            <td>
+                                <div>
+                                    <h6 class="mb-1">Reporte de Asistencia</h6>
+                                    <small class="text-muted">Control de horarios y puntualidad</small>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-info">Tiempo</span></td>
+                            <td>Semanal</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <span>RRHH</span>
+                                </div>
+                            </td>
+                            <td>27 Ago 2025</td>
+                            <td><span class="badge bg-success">Completado</span></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>REP004</td>
+                            <td>
+                                <div>
+                                    <h6 class="mb-1">Evaluación de Personal</h6>
+                                    <small class="text-muted">Calificaciones y métricas individuales</small>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-warning">Personal</span></td>
+                            <td>Trimestral</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <span>Gerente</span>
+                                </div>
+                            </td>
+                            <td>26 Ago 2025</td>
+                            <td><span class="badge bg-danger">Error</span></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <nav aria-label="Navegación de reportes">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Scheduled Reports -->
+    <div class="card card-dashboard mt-4">
+        <div class="card-header bg-transparent border-0">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-calendar-alt me-2 text-info"></i>
+                Reportes Programados
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex align-items-center p-3 border rounded">
+                        <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">Reporte Semanal de Productividad</h6>
+                            <p class="text-muted mb-0">Cada lunes a las 8:00 AM</p>
+                        </div>
+                        <button class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex align-items-center p-3 border rounded">
+                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-calendar text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">Reporte Mensual de Personal</h6>
+                            <p class="text-muted mb-0">Primer día de cada mes</p>
+                        </div>
+                        <button class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,22 @@
+# Dependencias para Windows - Logistica HR
+# Usar este archivo si tienes problemas con psycopg2-binary
+
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+# psycopg2-binary se instala por separado
+python-decouple==3.8
+Pillow==10.1.0
+django-filter==23.5
+django-extensions==3.2.3
+celery==5.3.4
+redis==5.0.1
+django-celery-beat==2.5.0
+django-celery-results==2.5.1
+whitenoise==6.6.0
+gunicorn==21.2.0
+
+# Nota: Instalar psycopg2-binary por separado con:
+# pip install psycopg2-binary
+
+

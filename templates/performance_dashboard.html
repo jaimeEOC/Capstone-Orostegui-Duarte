@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block title %}Rendimiento - Logistica HR{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Dashboard de Rendimiento</h1>
+            <p class="text-muted">Métricas y análisis del desempeño del personal</p>
+        </div>
+        <div>
+            <button class="btn btn-primary">
+                <i class="fas fa-download me-2"></i>
+                Exportar Reporte
+            </button>
+        </div>
+    </div>
+
+    <!-- Performance Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">94.2%</h4>
+                        <p class="mb-0 opacity-75">Productividad General</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">87.5%</h4>
+                        <p class="mb-0 opacity-75">Cumplimiento de Tareas</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">92.1%</h4>
+                        <p class="mb-0 opacity-75">Puntualidad</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">89.7%</h4>
+                        <p class="mb-0 opacity-75">Calidad del Trabajo</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-star fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Department Performance -->
+        <div class="col-lg-6 mb-4">
+            <div class="card card-dashboard">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>
+                        Rendimiento por Departamento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Almacén</span>
+                            <span class="fw-bold">96.5%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" style="width: 96.5%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Transporte</span>
+                            <span class="fw-bold">91.2%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" style="width: 91.2%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Administración</span>
+                            <span class="fw-bold">88.7%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" style="width: 88.7%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Mantenimiento</span>
+                            <span class="fw-bold">85.3%</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-danger" style="width: 85.3%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Performers -->
+        <div class="col-lg-6 mb-4">
+            <div class="card card-dashboard">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-trophy me-2 text-warning"></i>
+                        Top Performers
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-medal text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">Carlos Mendoza</h6>
+                            <p class="text-muted mb-0">Operador de Montacarga - 98.5%</p>
+                        </div>
+                        <span class="badge bg-warning">1er Lugar</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-medal text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">María González</h6>
+                            <p class="text-muted mb-0">Conductor de Camión - 96.8%</p>
+                        </div>
+                        <span class="badge bg-secondary">2do Lugar</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-medal text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">Roberto Silva</h6>
+                            <p class="text-muted mb-0">Jefe de Almacén - 95.2%</p>
+                        </div>
+                        <span class="badge bg-danger">3er Lugar</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-medal text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">Ana López</h6>
+                            <p class="text-muted mb-0">Supervisor de Calidad - 93.7%</p>
+                        </div>
+                        <span class="badge bg-info">4to Lugar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Trends -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-dashboard">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-area me-2 text-success"></i>
+                        Tendencias de Rendimiento (Últimos 30 días)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Gráfico de tendencias se mostrará aquí</p>
+                        <small class="text-muted">Integración con Chart.js en desarrollo</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Details -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-dashboard">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-table me-2 text-info"></i>
+                        Detalle de Métricas por Empleado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Empleado</th>
+                                    <th>Departamento</th>
+                                    <th>Tareas Completadas</th>
+                                    <th>Productividad</th>
+                                    <th>Puntualidad</th>
+                                    <th>Calidad</th>
+                                    <th>Puntuación Total</th>
+                                    <th>Tendencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                            <span>Carlos Mendoza</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-info">Almacén</span></td>
+                                    <td>45/46</td>
+                                    <td>98.5%</td>
+                                    <td>96.2%</td>
+                                    <td>98.8%</td>
+                                    <td><span class="badge bg-success">98.5%</span></td>
+                                    <td><i class="fas fa-arrow-up text-success"></i></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                            <span>María González</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-warning">Transporte</span></td>
+                                    <td>38/39</td>
+                                    <td>96.8%</td>
+                                    <td>95.5%</td>
+                                    <td>97.2%</td>
+                                    <td><span class="badge bg-success">96.8%</span></td>
+                                    <td><i class="fas fa-arrow-up text-success"></i></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                            <span>Roberto Silva</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-info">Almacén</span></td>
+                                    <td>42/44</td>
+                                    <td>95.2%</td>
+                                    <td>93.8%</td>
+                                    <td>95.5%</td>
+                                    <td><span class="badge bg-success">95.2%</span></td>
+                                    <td><i class="fas fa-arrow-down text-danger"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

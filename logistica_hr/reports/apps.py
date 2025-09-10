@@ -6,3 +6,5 @@ class ReportsConfig(AppConfig):
     name = 'logistica_hr.reports'
 
 
+
+

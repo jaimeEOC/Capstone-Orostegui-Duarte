@@ -278,3 +278,5 @@ class ReportParameter(BaseModel):
         return f"{self.name} ({self.get_parameter_type_display()})"
 
 
+
+

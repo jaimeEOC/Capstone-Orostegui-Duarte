@@ -6,3 +6,5 @@ class TasksConfig(AppConfig):
     name = 'logistica_hr.tasks'
 
 
+
+

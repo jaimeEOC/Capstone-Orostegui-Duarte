@@ -255,3 +255,5 @@ admin.site.site_title = _('Logistica HR Admin')
 admin.site.index_title = _('Panel de Control de Logistica HR')
 
 
+
+

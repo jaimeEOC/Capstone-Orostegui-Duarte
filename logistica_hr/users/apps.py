@@ -6,3 +6,5 @@ class UsersConfig(AppConfig):
     name = 'logistica_hr.users'
     verbose_name = 'Usuarios'
 
+
+

@@ -16,3 +16,5 @@ redis==5.0.1
 # Nota: Pillow se puede instalar después si es necesario
 
 
+
+

@@ -6,3 +6,5 @@ class PerformanceConfig(AppConfig):
     name = 'logistica_hr.performance'
 
 
+
+

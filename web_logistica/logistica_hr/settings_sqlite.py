@@ -39,11 +39,11 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'logistica_hr.core.apps.CoreConfig',
-    # 'logistica_hr.users.apps.UsersConfig',          # Comentado temporalmente
-    # 'logistica_hr.employees.apps.EmployeesConfig',  # Comentado temporalmente
-    # 'logistica_hr.tasks.apps.TasksConfig',          # Comentado temporalmente
-    # 'logistica_hr.performance.apps.PerformanceConfig', # Comentado temporalmente
-    # 'logistica_hr.reports.apps.ReportsConfig',      # Comentado temporalmente
+    'logistica_hr.users.apps.UsersConfig',
+    'logistica_hr.employees.apps.EmployeesConfig',
+    'logistica_hr.tasks.apps.TasksConfig',
+    'logistica_hr.performance.apps.PerformanceConfig',
+    'logistica_hr.reports.apps.ReportsConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -57,6 +57,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'logistica_hr.core.middleware.AuthenticationMiddleware',
+    'logistica_hr.core.middleware.RoleBasedRedirectMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -125,7 +127,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model (comentado temporalmente)
-# AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.User'
 
 # REST Framework configuration
 REST_FRAMEWORK = {

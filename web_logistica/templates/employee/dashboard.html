@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Empleado - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .dashboard-header {
+        background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .error-message {
+        background: #fed7d7;
+        color: #c53030;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin: 2rem 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-icon.tasks { background: #e3f2fd; color: #1976d2; }
+    .stat-icon.completed { background: #e8f5e8; color: #388e3c; }
+    .stat-icon.packages { background: #fff3e0; color: #f57c00; }
+    .stat-icon.trucks { background: #f3e5f5; color: #7b1fa2; }
+    .stat-icon.quality { background: #fce4ec; color: #c2185b; }
+    .stat-icon.incidents { background: #ffebee; color: #d32f2f; }
+    
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .main-content {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .today-log {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .log-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .log-item:last-child {
+        border-bottom: none;
+    }
+    
+    .log-label {
+        font-weight: 600;
+        color: #4a5568;
+    }
+    
+    .log-value {
+        color: #2d3748;
+        font-weight: 700;
+    }
+    
+    .task-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .task-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+    
+    .task-item:hover {
+        background-color: #f7fafc;
+    }
+    
+    .task-priority {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+    }
+    
+    .priority-high { background: #e53e3e; }
+    .priority-medium { background: #dd6b20; }
+    .priority-low { background: #38a169; }
+    
+    .task-content {
+        flex: 1;
+    }
+    
+    .task-title {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+    }
+    
+    .task-description {
+        color: #718096;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .task-meta {
+        color: #a0aec0;
+        font-size: 0.8rem;
+    }
+    
+    .task-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background: #fed7d7;
+        color: #c53030;
+    }
+    
+    .status-progress {
+        background: #fef5e7;
+        color: #dd6b20;
+    }
+    
+    .status-completed {
+        background: #c6f6d5;
+        color: #2f855a;
+    }
+    
+    .performance-chart {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .chart-placeholder {
+        height: 200px;
+        background: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a0aec0;
+        font-style: italic;
+    }
+    
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .action-button {
+        background: linear-gradient(135deg, #38a169, #48bb78);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .action-icon {
+        font-size: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Mi Dashboard</h1>
+        <p class="dashboard-subtitle">Bienvenido, {{ user.full_name }} - Tu espacio de trabajo</p>
+    </div>
+    
+    {% if error %}
+    <div class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% else %}
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon tasks">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.my_tasks_pending|default:"0" }}</div>
+            <div class="stat-label">Tareas Pendientes</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon completed">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.my_tasks_completed|default:"0" }}</div>
+            <div class="stat-label">Tareas Completadas</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon packages">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.total_packages|default:"0" }}</div>
+            <div class="stat-label">Paquetes (7 días)</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon trucks">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.total_trucks|default:"0" }}</div>
+            <div class="stat-label">Camiones (7 días)</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon quality">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.avg_quality|floatformat:2|default:"0" }}</div>
+            <div class="stat-label">Calidad Promedio</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon incidents">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.total_incidents|default:"0" }}</div>
+            <div class="stat-label">Incidentes (7 días)</div>
+        </div>
+    </div>
+    
+    <div class="content-grid">
+        <div class="main-content">
+            <h2 class="section-title">Registro de Hoy</h2>
+            {% if today_log %}
+            <div class="today-log">
+                <div class="log-item">
+                    <span class="log-label">Hora de Inicio:</span>
+                    <span class="log-value">{{ today_log.start_time }}</span>
+                </div>
+                <div class="log-item">
+                    <span class="log-label">Hora de Fin:</span>
+                    <span class="log-value">{{ today_log.end_time }}</span>
+                </div>
+                <div class="log-item">
+                    <span class="log-label">Paquetes Procesados:</span>
+                    <span class="log-value">{{ today_log.packages_processed }}</span>
+                </div>
+                <div class="log-item">
+                    <span class="log-label">Camiones Recibidos:</span>
+                    <span class="log-value">{{ today_log.trucks_received }}</span>
+                </div>
+                <div class="log-item">
+                    <span class="log-label">Camiones Despachados:</span>
+                    <span class="log-value">{{ today_log.trucks_dispatched }}</span>
+                </div>
+                <div class="log-item">
+                    <span class="log-label">Puntaje de Calidad:</span>
+                    <span class="log-value">{{ today_log.quality_score|floatformat:2|default:"No evaluado" }}</span>
+                </div>
+                <div class="log-item">
+                    <span class="log-label">Incidentes:</span>
+                    <span class="log-value">{{ today_log.safety_incidents }}</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="today-log">
+                <p style="text-align: center; color: #718096; margin: 0;">
+                    <i class="fas fa-info-circle"></i>
+                    No hay registro de trabajo para hoy
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="main-content">
+            <h2 class="section-title">Mis Tareas</h2>
+            <ul class="task-list">
+                {% for task in my_tasks %}
+                <li class="task-item">
+                    <div class="task-priority priority-{{ task.priority }}"></div>
+                    <div class="task-content">
+                        <div class="task-title">{{ task.title }}</div>
+                        <div class="task-description">{{ task.description|truncatechars:50 }}</div>
+                        <div class="task-meta">
+                            Asignada: {{ task.created_at|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                    <div class="task-status status-{{ task.status }}">
+                        {{ task.get_status_display }}
+                    </div>
+                </li>
+                {% empty %}
+                <li class="task-item">
+                    <div class="task-content">
+                        <div class="task-title">No hay tareas asignadas</div>
+                        <div class="task-description">Todas las tareas están completadas</div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <h2 class="section-title">Mi Rendimiento (Últimos 7 días)</h2>
+        <div class="performance-chart">
+            <div class="chart-placeholder">
+                <i class="fas fa-chart-line"></i>
+                Gráfico de rendimiento próximamente
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+    
+    <div class="quick-actions">
+        <a href="/tasks/" class="action-button">
+            <i class="fas fa-tasks action-icon"></i>
+            <span>Ver Mis Tareas</span>
+        </a>
+        
+        <a href="/performance/" class="action-button">
+            <i class="fas fa-chart-bar action-icon"></i>
+            <span>Mi Rendimiento</span>
+        </a>
+        
+        <a href="/profile/" class="action-button">
+            <i class="fas fa-user action-icon"></i>
+            <span>Mi Perfil</span>
+        </a>
+        
+        <a href="#" class="action-button" onclick="logWork()">
+            <i class="fas fa-clock action-icon"></i>
+            <span>Registrar Trabajo</span>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function logWork() {
+    alert('Función de registro de trabajo próximamente disponible.');
+}
+
+// Actualizar estadísticas cada 30 segundos
+setInterval(function() {
+    fetch('/api/dashboard/stats/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Mis estadísticas actualizadas:', data.stats);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}, 30000);
+</script>
+{% endblock %}

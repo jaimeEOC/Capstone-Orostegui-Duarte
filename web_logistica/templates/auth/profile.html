@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Perfil de Usuario - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 3rem;
+    }
+    
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-role {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        display: inline-block;
+    }
+    
+    .profile-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f7fafc;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #4a5568;
+    }
+    
+    .info-value {
+        color: #2d3748;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .role-admin {
+        background: #fed7d7;
+        color: #c53030;
+    }
+    
+    .role-supervisor {
+        background: #bee3f8;
+        color: #2b6cb0;
+    }
+    
+    .role-employee {
+        background: #c6f6d5;
+        color: #2f855a;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+    
+    .btn-secondary:hover {
+        background: #cbd5e0;
+    }
+    
+    .btn-danger {
+        background: #fed7d7;
+        color: #c53030;
+    }
+    
+    .btn-danger:hover {
+        background: #feb2b2;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <h1 class="profile-name">{{ user.full_name }}</h1>
+        <div class="profile-role">
+            <span class="role-badge role-{{ user.role }}">{{ user.get_role_display }}</span>
+        </div>
+    </div>
+    
+    <div class="profile-content">
+        <div class="profile-card">
+            <h2 class="card-title">Información Personal</h2>
+            <div class="info-item">
+                <span class="info-label">Usuario:</span>
+                <span class="info-value">{{ user.username }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ user.email }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Nombre:</span>
+                <span class="info-value">{{ user.first_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Apellido:</span>
+                <span class="info-value">{{ user.last_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Teléfono:</span>
+                <span class="info-value">{{ user.phone|default:"No especificado" }}</span>
+            </div>
+        </div>
+        
+        <div class="profile-card">
+            <h2 class="card-title">Información del Sistema</h2>
+            <div class="info-item">
+                <span class="info-label">Rol:</span>
+                <span class="info-value">{{ user.get_role_display }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estado:</span>
+                <span class="info-value">
+                    {% if user.is_active %}
+                        <span style="color: #2f855a;">✓ Activo</span>
+                    {% else %}
+                        <span style="color: #c53030;">✗ Inactivo</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Verificado:</span>
+                <span class="info-value">
+                    {% if user.is_verified %}
+                        <span style="color: #2f855a;">✓ Sí</span>
+                    {% else %}
+                        <span style="color: #c53030;">✗ No</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Último acceso:</span>
+                <span class="info-value">
+                    {% if user.last_login %}
+                        {{ user.last_login|date:"d/m/Y H:i" }}
+                    {% else %}
+                        Nunca
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Miembro desde:</span>
+                <span class="info-value">{{ user.date_joined|date:"d/m/Y" }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <a href="{% url 'users:dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i>
+            Ir al Dashboard
+        </a>
+        <a href="#" class="btn btn-secondary" onclick="editProfile()">
+            <i class="fas fa-edit"></i>
+            Editar Perfil
+        </a>
+        <a href="{% url 'users:logout' %}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres cerrar sesión?')">
+            <i class="fas fa-sign-out-alt"></i>
+            Cerrar Sesión
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editProfile() {
+    alert('Función de edición de perfil próximamente disponible.');
+}
+</script>
+{% endblock %}

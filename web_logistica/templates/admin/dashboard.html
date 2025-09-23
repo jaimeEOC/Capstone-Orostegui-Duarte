@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Administrador - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-icon.users { background: #e3f2fd; color: #1976d2; }
+    .stat-icon.employees { background: #e8f5e8; color: #388e3c; }
+    .stat-icon.departments { background: #fff3e0; color: #f57c00; }
+    .stat-icon.packages { background: #fce4ec; color: #c2185b; }
+    .stat-icon.trucks { background: #f3e5f5; color: #7b1fa2; }
+    .stat-icon.active { background: #e0f2f1; color: #00695c; }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+    
+    .main-content {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .departments-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .department-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+    
+    .department-item:hover {
+        background-color: #f7fafc;
+    }
+    
+    .department-name {
+        font-weight: 600;
+        color: #2d3748;
+    }
+    
+    .department-count {
+        background: #667eea;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .activities-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f7fafc;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 0.9rem;
+        color: #4a5568;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-action {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+    }
+    
+    .activity-user {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+    
+    .activity-time {
+        color: #a0aec0;
+        font-size: 0.8rem;
+    }
+    
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .action-button {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .action-icon {
+        font-size: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Dashboard Administrador</h1>
+        <p class="dashboard-subtitle">Bienvenido, {{ user.full_name }} - Panel de control del sistema</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon users">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_users }}</div>
+            <div class="stat-label">Usuarios Totales</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon employees">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_employees }}</div>
+            <div class="stat-label">Empleados</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon departments">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_departments }}</div>
+            <div class="stat-label">Departamentos</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon packages">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_packages_today }}</div>
+            <div class="stat-label">Paquetes Hoy</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon trucks">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_trucks_today }}</div>
+            <div class="stat-label">Camiones Hoy</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-number">{{ stats.active_employees_today }}</div>
+            <div class="stat-label">Empleados Activos</div>
+        </div>
+    </div>
+    
+    <div class="content-grid">
+        <div class="main-content">
+            <h2 class="section-title">Departamentos por Empleados</h2>
+            <ul class="departments-list">
+                {% for dept in departments_stats %}
+                <li class="department-item">
+                    <span class="department-name">{{ dept.name }}</span>
+                    <span class="department-count">{{ dept.employee_count }} empleados</span>
+                </li>
+                {% empty %}
+                <li class="department-item">
+                    <span class="department-name">No hay departamentos registrados</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <h2 class="section-title">Actividades Recientes</h2>
+            <ul class="activities-list">
+                {% for activity in recent_activities %}
+                <li class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-action">{{ activity.action }}</div>
+                        <div class="activity-user">{{ activity.user }}</div>
+                        <div class="activity-time">{{ activity.time }}</div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="activity-item">
+                    <div class="activity-content">
+                        <div class="activity-action">No hay actividades recientes</div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+    <div class="quick-actions">
+        <a href="/admin/" class="action-button">
+            <i class="fas fa-cog action-icon"></i>
+            <span>Panel de Administración</span>
+        </a>
+        
+        <a href="/employees/" class="action-button">
+            <i class="fas fa-users action-icon"></i>
+            <span>Gestionar Empleados</span>
+        </a>
+        
+        <a href="/reports/" class="action-button">
+            <i class="fas fa-chart-bar action-icon"></i>
+            <span>Ver Reportes</span>
+        </a>
+        
+        <a href="/performance/" class="action-button">
+            <i class="fas fa-tachometer-alt action-icon"></i>
+            <span>Rendimiento</span>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Actualizar estadísticas cada 30 segundos
+setInterval(function() {
+    fetch('/api/dashboard/stats/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar números en tiempo real
+                console.log('Estadísticas actualizadas:', data.stats);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}, 30000);
+</script>
+{% endblock %}

@@ -105,11 +105,11 @@ def dashboard_redirect(request):
     user = request.user
     
     if user.is_admin():
-        return redirect('admin:dashboard')
+        return redirect('admin_dashboard')
     elif user.is_supervisor():
-        return redirect('supervisor:dashboard')
+        return redirect('supervisor_dashboard')
     else:
-        return redirect('employee:dashboard')
+        return redirect('employee_dashboard')
 
 
 # API Views para autenticación

@@ -93,18 +93,81 @@ logistica_hr/
 - Múltiples formatos (PDF, Excel, CSV, JSON)
 - Dashboards con indicadores clave
 
-## 🛠️ Instalación y Configuración
+## 🚀 Inicio Rápido
+
+### ⚡ Instalación Automática (Más Fácil)
+
+#### Windows
+```bash
+# 1. Navegar al directorio
+cd web_logistica
+
+# 2. Ejecutar script de instalación
+.\instalar.bat
+```
+
+#### Linux/Mac
+```bash
+# 1. Navegar al directorio
+cd web_logistica
+
+# 2. Ejecutar script de instalación
+./instalar.sh
+```
+
+### ⚙️ Instalación Manual (Paso a paso)
+
+```bash
+# 1. Navegar al directorio
+cd web_logistica
+
+# 2. Activar entorno virtual
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
+
+# 3. Instalar dependencias
+pip install -r requirements-windows-simple.txt
+
+# 4. Configurar base de datos
+python manage.py makemigrations --settings=logistica_hr.settings_sqlite
+python manage.py migrate --settings=logistica_hr.settings_sqlite
+
+# 5. Crear superusuario
+python create_superuser.py
+
+# 6. Ejecutar servidor
+python manage.py runserver --settings=logistica_hr.settings_sqlite
+```
+
+### 🌐 Acceder al Sistema
+- **Página principal**: http://localhost:8000/
+- **Panel de administración**: http://localhost:8000/admin/
+  - Usuario: `admin`
+  - Contraseña: `admin123`
+
+---
+
+## 📋 Archivos de Requirements
+
+| Archivo | Descripción | Recomendado para |
+|---------|-------------|------------------|
+| `requirements-windows-simple.txt` | ⭐ **Dependencias básicas** | Desarrollo simple |
+| `requirements-windows.txt` | Dependencias para Windows + PostgreSQL | Windows con PostgreSQL |
+| `requirements.txt` | Dependencias completas | Producción |
+
+---
+
+## 🛠️ Instalación Completa
 
 ### Prerrequisitos
 - Python 3.8+
-- PostgreSQL 12+
-- Redis (para Celery)
-- Node.js 16+ (para frontend)
+- PostgreSQL 12+ (opcional)
+- Redis (opcional, para Celery)
 
 ### 1. Clonar el Repositorio
 ```bash
 git clone <url-del-repositorio>
-cd logistica_hr
+cd web_logistica
 ```
 
 ### 2. Crear Entorno Virtual
@@ -115,6 +178,10 @@ source venv/bin/activate  # En Windows: venv\Scripts\activate
 
 ### 3. Instalar Dependencias
 ```bash
+# Para desarrollo simple (recomendado)
+pip install -r requirements-windows-simple.txt
+
+# Para instalación completa
 pip install -r requirements.txt
 ```
 
@@ -136,6 +203,14 @@ CELERY_RESULT_BACKEND=redis://localhost:6379/0
 ```
 
 ### 5. Configurar Base de Datos
+
+#### Opción A: SQLite (Simple)
+```bash
+python manage.py makemigrations --settings=logistica_hr.settings_sqlite
+python manage.py migrate --settings=logistica_hr.settings_sqlite
+```
+
+#### Opción B: PostgreSQL (Completo)
 ```bash
 # Crear base de datos PostgreSQL
 createdb logistica_hr
@@ -147,10 +222,21 @@ python manage.py migrate
 
 ### 6. Crear Superusuario
 ```bash
+# Opción A: Script automático
+python create_superuser.py
+
+# Opción B: Manual
 python manage.py createsuperuser
 ```
 
 ### 7. Ejecutar el Proyecto
+
+#### Desarrollo Simple
+```bash
+python manage.py runserver --settings=logistica_hr.settings_sqlite
+```
+
+#### Producción Completa
 ```bash
 # Terminal 1: Servidor Django
 python manage.py runserver
@@ -161,6 +247,12 @@ celery -A logistica_hr worker -l info
 # Terminal 3: Celery Beat (para tareas programadas)
 celery -A logistica_hr beat -l info
 ```
+
+---
+
+## 📖 Guía Detallada
+
+Para una guía completa con solución de problemas, consulta: **[GUIA_EJECUCION.md](GUIA_EJECUCION.md)**
 
 ## 📱 Uso del Sistema
 

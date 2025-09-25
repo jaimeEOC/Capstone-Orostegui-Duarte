@@ -36,6 +36,11 @@ class AuthenticationMiddleware(MiddlewareMixin):
     }
     
     def process_request(self, request):
+        # Excepciones: permitir registro y login sin autenticación
+        path = getattr(request, 'path', '') or ''
+        if path.startswith('/users/register') or path.startswith('/users/login') or path == '/users/api/login/':
+            return None
+
         """Procesa cada request para verificar autenticación y permisos"""
         
         # Si es una URL pública, permitir acceso

@@ -4,6 +4,7 @@ Vistas para la aplicación users
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -11,7 +12,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.generic import FormView
 from django.urls import reverse
+from .forms import RegistrationForm
 import json
 
 from .models import User
@@ -195,3 +198,31 @@ def api_profile(request):
             'date_joined': user.date_joined.isoformat()
         }
     })
+
+
+from django.views.generic import FormView
+from .forms import RegistrationForm
+
+class RegisterView(FormView):
+    template_name = "auth/register.html"
+    form_class = RegistrationForm
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(request.user.get_dashboard_url())
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.save()
+        # Auto-login
+        raw_password = form.cleaned_data.get("password1")
+        user = authenticate(self.request, username=user.username, password=raw_password)
+        if user is not None:
+            auth_login(self.request, user)
+            messages.success(self.request, "¡Cuenta creada y sesión iniciada!")
+            try:
+                return redirect(user.get_dashboard_url())
+            except Exception:
+                return redirect('/')
+        messages.success(self.request, "¡Usuario creado! Inicia sesión.")
+        return redirect("users:login")

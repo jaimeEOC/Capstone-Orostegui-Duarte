@@ -87,6 +87,7 @@ def logout_view(request):
     """Vista para cerrar sesión"""
     if request.user.is_authenticated:
         logout(request)
+        messages.get_messages(request).used = True
         messages.info(request, 'Has cerrado sesión correctamente.')
     return redirect('users:login')
 

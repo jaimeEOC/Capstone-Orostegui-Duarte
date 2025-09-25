@@ -87,6 +87,7 @@ def logout_view(request):
     """Vista para cerrar sesión"""
     if request.user.is_authenticated:
         logout(request)
+        messages.get_messages(request).used = True
         messages.info(request, 'Has cerrado sesión correctamente.')
     return redirect('users:login')
 
@@ -105,11 +106,11 @@ def dashboard_redirect(request):
     user = request.user
     
     if user.is_admin():
-        return redirect('admin:dashboard')
+        return redirect('admin_dashboard')
     elif user.is_supervisor():
-        return redirect('supervisor:dashboard')
+        return redirect('supervisor_dashboard')
     else:
-        return redirect('employee:dashboard')
+        return redirect('employee_dashboard')
 
 
 # API Views para autenticación

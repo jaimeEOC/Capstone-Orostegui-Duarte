@@ -429,17 +429,17 @@
     {% endif %}
     
     <div class="quick-actions">
-        <a href="/tasks/" class="action-button">
+        <a href="#" class="action-button" onclick="alert('Módulo de Tareas próximamente disponible')">
             <i class="fas fa-tasks action-icon"></i>
             <span>Ver Mis Tareas</span>
         </a>
         
-        <a href="/performance/" class="action-button">
+        <a href="#" class="action-button" onclick="alert('Módulo de Rendimiento próximamente disponible')">
             <i class="fas fa-chart-bar action-icon"></i>
             <span>Mi Rendimiento</span>
         </a>
         
-        <a href="/profile/" class="action-button">
+        <a href="{% url 'users:profile' %}" class="action-button">
             <i class="fas fa-user action-icon"></i>
             <span>Mi Perfil</span>
         </a>

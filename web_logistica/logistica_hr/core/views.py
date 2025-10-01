@@ -133,12 +133,20 @@ def employee_dashboard(request):
     except:
         employee = None
     
-    if not employee:
-        context = {
-            'user': request.user,
-            'error': 'No se encontró perfil de empleado asociado a tu cuenta.'
-        }
-        return render(request, 'employee/dashboard.html', context)
+    if not employee and request.user.role == 'employee':
+        from logistica_hr.employees.models import Employee, Department
+        from datetime import date
+        dept, _ = Department.objects.get_or_create(
+            name='General',
+            defaults={'description': 'Departamento por defecto'}
+        )
+        employee = Employee.objects.create(
+            user=request.user,
+            employee_id=f"EMP{request.user.id:04d}",
+            position=None,
+            hire_date=date.today(),
+            supervisor=None
+        )
     
     # Estadísticas personales
     today = datetime.now().date()

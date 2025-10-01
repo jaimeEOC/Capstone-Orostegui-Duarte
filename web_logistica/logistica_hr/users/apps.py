@@ -6,5 +6,5 @@ class UsersConfig(AppConfig):
     name = 'logistica_hr.users'
     verbose_name = 'Usuarios'
 
-
-
+    def ready(self):
+        import logistica_hr.users.signals  # noqa

@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Tareas - Logistica HR{% endblock %}
+
+{% block content %}
+<div style="max-width:1200px;margin:0 auto;padding:2rem 1rem;">
+  <div style="background:linear-gradient(135deg,#38a169 0%,#48bb78 100%);color:#fff;padding:2rem;border-radius:15px;margin-bottom:2rem;text-align:center;">
+    <h1 style="font-size:2rem;font-weight:700;margin:0 0 .25rem 0;">Mis Tareas</h1>
+    <p style="opacity:.9;margin:0;">Hola, {{ user.get_full_name|default:user.username }}</p>
+  </div>
+
+  <div style="background:#fff;border-radius:15px;padding:1.25rem;box-shadow:0 4px 6px rgba(0,0,0,.08);">
+    <h2 style="font-size:1.2rem;font-weight:700;color:#2d3748;margin:0 0 1rem 0;padding-bottom:.5rem;border-bottom:2px solid #e2e8f0;">Listado</h2>
+
+    <div style="width:100%;overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;">
+        <thead>
+          <tr>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Tarea</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Prioridad</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Estado</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Comentario</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Acción</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Fecha de asignación</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Inicio</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Término</th>
+            <th style="position:sticky;top:0;background:#f7fafc;color:#2d3748;font-weight:700;border-bottom:2px solid #e2e8f0;padding:.6rem;text-align:left;">Fecha de vencimiento</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for task in my_tasks %}
+          <tr style="border-bottom:1px solid #edf2f7;">
+            <!-- Tarea -->
+            <td style="padding:.6rem;vertical-align:top;">
+              <span style="color:#2d3748">{{ task.title }}</span>
+              {% if task.is_overdue and task.status != 'completed' %}
+                <div style="color:#c53030;font-weight:700;margin-top:.2rem;">Vencida</div>
+              {% endif %}
+              {% if task.category %}
+                <div style="color:#718096;font-size:.85rem;margin-top:.2rem;">{{ task.category.name }}</div>
+              {% endif %}
+            </td>
+
+            <!-- Prioridad (chips inline) -->
+            <td style="padding:.6rem;vertical-align:top;">
+              {% if task.priority == 'urgent' or task.priority == 'urgente' %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid #feb2b2;background:#ffe0e0;color:#c53030;">Urgente</span>
+              {% elif task.priority == 'high' or task.priority == 'alta' %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid #fbb6ce;background:#fde8f3;color:#97266d;">Alta</span>
+              {% elif task.priority == 'medium' or task.priority == 'media' %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid #fbd38d;background:#fffbea;color:#b7791f;">Media</span>
+              {% elif task.priority == 'low' or task.priority == 'baja' %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid #b2f5ea;background:#e6fffa;color:#047857;">Baja</span>
+              {% else %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid #cbd5e0;background:#e2e8f0;color:#2d3748;">{{ task.get_priority_display }}</span>
+              {% endif %}
+            </td>
+
+            <!-- Estado (chips inline) -->
+            <td data-col="status" style="padding:.6rem;vertical-align:top;">
+              {% if task.status == 'pending' %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#ffe0e0;color:#c53030;">Pendiente</span>
+              {% elif task.status == 'in_progress' %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#fffbea;color:#b7791f;">En progreso</span>
+              {% elif task.status == 'completed' %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#c6f6d5;color:#2f855a;">Completada</span>
+              {% else %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#e2e8f0;color:#2d3748;">{{ task.get_status_display }}</span>
+              {% endif %}
+            </td>
+
+            <!-- Comentario -->
+            <td style="padding:.6rem;vertical-align:top;">
+              {% if task.description %}
+                <div style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#4a5568;">{{ task.description }}</div>
+              {% else %}
+                <span style="color:#718096;">—</span>
+              {% endif %}
+            </td>
+
+            <!-- Acción: un solo botón (inline styles) -->
+            <td data-col="action" style="padding:.6rem;vertical-align:top;">
+              {% if task.status == 'pending' %}
+                <button
+                  style="font-size:.82rem;padding:.38rem .7rem;border-radius:8px;border:none;cursor:pointer;background:#f6ad55;color:#1a202c;box-shadow:0 2px 4px rgba(0,0,0,.06);"
+                  data-url="{% url 'tasks:update_task_status_api' task.id 'in_progress' %}"
+                  onclick="updateTaskStatus(this,'in_progress')">
+                  Iniciar
+                </button>
+              {% elif task.status == 'in_progress' %}
+                <button
+                  style="font-size:.82rem;padding:.38rem .7rem;border-radius:8px;border:none;cursor:pointer;background:#38a169;color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.06);"
+                  data-url="{% url 'tasks:update_task_status_api' task.id 'completed' %}"
+                  onclick="updateTaskStatus(this,'completed')">
+                  Completar
+                </button>
+              {% else %}
+                <span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#c6f6d5;color:#2f855a;">Completada</span>
+              {% endif %}
+            </td>
+
+            <!-- Fechas -->
+            <td style="padding:.6rem;vertical-align:top;">{{ task.assigned_at|date:"d/m/Y H:i"|default:"—" }}</td>
+            <td class="start-col" style="padding:.6rem;vertical-align:top;">{{ task.start_date|date:"d/m/Y H:i"|default:"—" }}</td>
+            <td class="end-col" style="padding:.6rem;vertical-align:top;">{{ task.completion_date|date:"d/m/Y H:i"|default:"—" }}</td>
+            <td style="padding:.6rem;vertical-align:top;">{{ task.due_date|date:"d/m/Y H:i"|default:"—" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9" style="color:#718096;padding:.8rem;">No hay tareas asignadas</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+</div>
+
+<!-- ====== JS DENTRO DEL MISMO BLOQUE (se renderiza sí o sí) ====== -->
+<script>
+// CSRF cookie helper
+function getCookie(name){
+  const m = document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
+  return m ? m.pop() : '';
+}
+
+// PUBLICAR en window para que el onclick lo vea
+window.updateTaskStatus = async function(btn, next){
+  if(!btn || btn.disabled) return;
+  const url = btn.dataset.url;
+  if(!url){ alert('URL no encontrada'); return; }
+
+  const csrf = getCookie('csrftoken');
+  if(!csrf){ alert('No se encontró cookie CSRF. Recarga la página.'); return; }
+
+  btn.disabled = true;
+
+  try{
+    const resp = await fetch(url,{
+      method:'POST',
+      headers:{
+        'X-Requested-With':'XMLHttpRequest',
+        'X-CSRFToken': csrf,
+        'Accept':'application/json'
+      }
+    });
+
+    let data = null, raw = null;
+    try { data = await resp.json(); } catch(e){ try{ raw = await resp.text(); }catch(_){} }
+
+    if(!resp.ok || !data || (data.ok!==true && data.ok!=='True')){
+      let msg = (data && (data.error || data.detail)) || raw || `HTTP ${resp.status}`;
+      if(resp.status === 403) msg = '403: No autorizado (usuario no asignado o CSRF).';
+      if(resp.status === 404) msg = '404: Endpoint no encontrado.';
+      if(resp.status === 405) msg = '405: Método no permitido (debe ser POST).';
+      throw new Error(msg);
+    }
+
+    const row = btn.closest('tr');
+    const statusCell = row.querySelector('[data-col="status"]');
+    const actionCell = row.querySelector('[data-col="action"]');
+    const startCell  = row.querySelector('.start-col');
+    const endCell    = row.querySelector('.end-col');
+
+    if(next === 'in_progress'){
+      if(statusCell){
+        statusCell.innerHTML = '<span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#fffbea;color:#b7791f;">En progreso</span>';
+      }
+      const nextUrl = url.replace('/in_progress/','/completed/');
+      if(actionCell){
+        actionCell.innerHTML = `
+          <button
+            style="font-size:.82rem;padding:.38rem .7rem;border-radius:8px;border:none;cursor:pointer;background:#38a169;color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.06);"
+            data-url="${nextUrl}"
+            onclick="updateTaskStatus(this,'completed')">
+            Completar
+          </button>`;
+      }
+      if(startCell && (!startCell.textContent.trim() || startCell.textContent.trim()==='—')){
+        startCell.textContent = (data && data.started_at) || new Date().toLocaleString();
+      }
+    } else if(next === 'completed'){
+      if(statusCell){
+        statusCell.innerHTML = '<span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#c6f6d5;color:#2f855a;">Completada</span>';
+      }
+      if(actionCell){
+        actionCell.innerHTML = '<span style="display:inline-block;padding:.25rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#c6f6d5;color:#2f855a;">Completada</span>';
+      }
+      if(endCell && (!endCell.textContent.trim() || endCell.textContent.trim()==='—')){
+        endCell.textContent = (data && data.completed_at) || new Date().toLocaleString();
+      }
+      const firstCell = row.children[0];
+      if(firstCell){
+        firstCell.querySelectorAll('*').forEach(el=>{
+          if(el.textContent && el.textContent.trim()==='Vencida'){ el.remove(); }
+        });
+      }
+    }
+
+  }catch(e){
+    console.error('updateTaskStatus error:', e);
+    alert('No se pudo actualizar la tarea: ' + e.message);
+    btn.disabled = false;
+  }
+};
+</script>
+{% endblock %}

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Iniciar Sesión - Logistica HR{% endblock %}
+{% block title %}Registro de Usuario - Logistica HR{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -14,18 +14,18 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .login-container {
+    .register-container {
         background: white;
         border-radius: 20px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         padding: 3rem;
         width: 100%;
-        max-width: 400px;
+        max-width: 600px;
         position: relative;
         overflow: hidden;
     }
 
-    .login-container::before {
+    .register-container::before {
         content: '';
         position: absolute;
         top: 0;
@@ -82,7 +82,7 @@
         font-size: 0.9rem;
     }
 
-    .form-input {
+    .form-input, .form-select {
         width: 100%;
         padding: 0.875rem 1rem;
         border: 2px solid #e2e8f0;
@@ -92,7 +92,7 @@
         background: #f7fafc;
     }
 
-    .form-input:focus {
+    .form-input:focus, .form-select:focus {
         outline: none;
         border-color: #667eea;
         background: white;
@@ -103,16 +103,7 @@
         color: #a0aec0;
     }
 
-    .input-icon {
-        position: absolute;
-        right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #a0aec0;
-        font-size: 1.1rem;
-    }
-
-    .login-button {
+    .register-button {
         width: 100%;
         padding: 0.875rem;
         background: linear-gradient(135deg, #667eea, #764ba2);
@@ -127,35 +118,19 @@
         overflow: hidden;
     }
 
-    .login-button:hover {
+    .register-button:hover {
         transform: translateY(-2px);
         box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
     }
 
-    .login-button:active {
+    .register-button:active {
         transform: translateY(0);
     }
 
-    .login-button:disabled {
+    .register-button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
         transform: none;
-    }
-
-    .loading-spinner {
-        display: none;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #ffffff;
-        border-top: 2px solid transparent;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-right: 0.5rem;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
     }
 
     .alert {
@@ -240,22 +215,36 @@
         text-decoration: underline;
     }
 
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
     @media (max-width: 480px) {
-        .login-container {
+        .register-container {
             margin: 1rem;
             padding: 2rem;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 0;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="login-container">
+<div class="register-container">
     <div class="logo-section">
         <div class="logo-icon">
-            <i class="fas fa-truck"></i>
+            <i class="fas fa-user-plus"></i>
         </div>
-        <h1 class="logo-title">Logistica HR</h1>
+        <h1 class="logo-title">Crear Cuenta</h1>
         <p class="logo-subtitle">Sistema de Gestión de Personal</p>
     </div>
 
@@ -267,36 +256,95 @@
         {% endfor %}
     {% endif %}
 
-    <form method="post" id="loginForm">
+    {% if form.errors %}
+        <div class="alert alert-error">
+            Hay errores en el formulario. Revísalos por favor.
+        </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-error">
+            {% for error in form.non_field_errors %}
+                {{ error }}<br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" id="registerForm">
         {% csrf_token %}
 
         <div class="form-group">
-            <label for="username" class="form-label">Usuario</label>
-            <input type="text"
-                   id="username"
-                   name="username"
-                   class="form-input"
-                   placeholder="Ingresa tu nombre de usuario"
-                   required
-                   autocomplete="username">
-            <i class="fas fa-user input-icon"></i>
+            <label for="id_username" class="form-label">Nombre de Usuario</label>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
         </div>
 
         <div class="form-group">
-            <label for="password" class="form-label">Contraseña</label>
-            <input type="password"
-                   id="password"
-                   name="password"
-                   class="form-input"
-                   placeholder="Ingresa tu contraseña"
-                   required
-                   autocomplete="current-password">
-            <i class="fas fa-lock input-icon"></i>
+            <label for="id_email" class="form-label">Correo Electrónico</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
         </div>
 
-        <button type="submit" class="login-button" id="loginButton">
-            <span class="loading-spinner" id="loadingSpinner"></span>
-            <span id="buttonText">Iniciar Sesión</span>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_first_name" class="form-label">Nombre</label>
+                {{ form.first_name }}
+                {% for error in form.first_name.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_last_name" class="form-label">Apellido</label>
+                {{ form.last_name }}
+                {% for error in form.last_name.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_phone" class="form-label">Teléfono</label>
+            {{ form.phone }}
+            {% for error in form.phone.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_role" class="form-label">Rol</label>
+            {{ form.role }}
+            <div class="form-text">Selecciona tu rol en el sistema</div>
+            {% for error in form.role.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_password1" class="form-label">Contraseña</label>
+            {{ form.password1 }}
+            {% if form.password1.help_text %}
+                <div class="form-text">{{ form.password1.help_text|safe }}</div>
+            {% endif %}
+            {% for error in form.password1.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_password2" class="form-label">Confirmar Contraseña</label>
+            {{ form.password2 }}
+            {% for error in form.password2.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="register-button" id="registerButton">
+            <span id="buttonText">Crear Cuenta</span>
         </button>
     </form>
 
@@ -310,9 +358,7 @@
     </div>
 
     <div class="footer-links">
-        <a href="{% url 'users:register' %}">¿No tienes cuenta? Regístrate</a>
-        <a href="#" onclick="showHelp()">¿Necesitas ayuda?</a>
-        <a href="#" onclick="showContact()">Contacto</a>
+        <a href="{% url 'users:login' %}">¿Ya tienes cuenta? Inicia sesión</a>
     </div>
 </div>
 {% endblock %}
@@ -320,16 +366,14 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('loginForm');
-    const button = document.getElementById('loginButton');
+    const form = document.getElementById('registerForm');
+    const button = document.getElementById('registerButton');
     const buttonText = document.getElementById('buttonText');
-    const loadingSpinner = document.getElementById('loadingSpinner');
 
     form.addEventListener('submit', function(e) {
         // Mostrar loading
         button.disabled = true;
-        loadingSpinner.style.display = 'inline-block';
-        buttonText.textContent = 'Iniciando sesión...';
+        buttonText.textContent = 'Creando cuenta...';
 
         // Simular delay mínimo para UX
         setTimeout(() => {
@@ -338,22 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Auto-focus en el primer campo
-    document.getElementById('username').focus();
-
-    // Enter key navigation
-    document.getElementById('username').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            document.getElementById('password').focus();
-        }
-    });
+    document.getElementById('id_username').focus();
 });
-
-function showHelp() {
-    alert('Para obtener ayuda, contacta al administrador del sistema o revisa la documentación.');
-}
-
-function showContact() {
-    alert('Sistema Logistica HR\nDesarrollado por: Jaime Oróstegui y Jazmín Duarte\nDuocUC - 2025');
-}
 </script>
 {% endblock %}

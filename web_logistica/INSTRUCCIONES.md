@@ -1,37 +1,48 @@
-# 🚀 Logistica HR - Sistema de Gestión de Personal
-
-**Sistema de gestión y evaluación de personal para logística desarrollado en Django.**
+# 🚀 Logistica HR - Instrucciones de Uso
 
 ## ⚡ Inicio Rápido
 
 ### Windows
 ```bash
-cd web_logistica
+# Ejecutar desde el directorio web_logistica
 .\ejecutar.bat
 ```
 
 ### Linux/Mac
 ```bash
-cd web_logistica
+# Ejecutar desde el directorio web_logistica
 ./ejecutar.sh
 ```
 
 ### PowerShell (Windows)
 ```powershell
-cd web_logistica
+# Ejecutar desde el directorio web_logistica
 .\ejecutar.ps1
 ```
 
+## 🎯 ¿Qué hace el ejecutor?
+
+El ejecutor automático realiza todos estos pasos:
+
+1. ✅ **Verifica Python** (3.8+)
+2. ✅ **Crea entorno virtual** (si no existe)
+3. ✅ **Instala dependencias** automáticamente
+4. ✅ **Configura base de datos** SQLite
+5. ✅ **Crea usuario administrador**
+6. ✅ **Inicia el servidor** Django
+
 ## 🌐 Acceso al Sistema
+
+Una vez ejecutado, el sistema estará disponible en:
 
 - **Página principal**: http://localhost:8000/
 - **Panel de administración**: http://localhost:8000/admin/
 
-**Credenciales por defecto:**
+### Credenciales por defecto:
 - **Usuario**: `admin`
 - **Contraseña**: `admin123`
 
-## 📋 Funcionalidades
+## 📋 Funcionalidades del Sistema
 
 ### 👑 Administrador
 - Gestión completa de usuarios
@@ -50,23 +61,35 @@ cd web_logistica
 - Actualización de estado de tareas
 - Métricas personales
 
-## 🛠️ Estructura del Proyecto
+## 🔧 Solución de Problemas
+
+### Error: "Python no encontrado"
+- Instala Python 3.8+ desde https://python.org
+- Asegúrate de marcar "Add to PATH" durante la instalación
+
+### Error: "No se puede activar entorno virtual"
+- Ejecuta el script como administrador
+- Verifica que no haya espacios en la ruta del proyecto
+
+### Error: "Puerto 8000 en uso"
+- Cierra otras aplicaciones que usen el puerto 8000
+- O cambia el puerto en el comando final del script
+
+## 📁 Estructura del Proyecto
 
 ```
 web_logistica/
 ├── ejecutar.bat          # Ejecutor para Windows
 ├── ejecutar.ps1          # Ejecutor para PowerShell
 ├── ejecutar.sh           # Ejecutor para Linux/Mac
-├── crear_admin.py        # Script para crear usuario admin
 ├── manage.py             # Script principal de Django
 ├── logistica_hr/         # Configuración del proyecto
 ├── templates/            # Plantillas HTML
 ├── static/               # Archivos estáticos
-├── tests/                # Pruebas automatizadas
-└── venv/                 # Entorno virtual
+└── venv/                 # Entorno virtual (se crea automáticamente)
 ```
 
-## 🔧 Comandos Útiles
+## 🛠️ Comandos Útiles
 
 ### Verificar instalación
 ```bash
@@ -100,7 +123,3 @@ Si tienes problemas:
 ---
 
 **Logistica HR** - Sistema de Gestión de Personal para Logística 🚀
-
-**Desarrollado por**: Jaime Oróstegui y Jazmín Duarte  
-**Universidad**: DuocUC  
-**Año**: 2025

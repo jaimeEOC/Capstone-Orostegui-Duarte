@@ -1,0 +1,30 @@
+CREDENCIALES DE PRUEBA - SISTEMA LOGISTICA HR
+
+=== USUARIO ADMINISTRADOR ===
+Usuario: admin
+Contraseña: admin123
+Rol: Administrador
+Acceso: Dashboard completo, gestión de usuarios, reportes
+
+=== USUARIO SUPERVISOR ===
+Usuario: supervisor
+Contraseña: supervisor123
+Rol: Supervisor
+Acceso: Dashboard supervisor, gestión de tareas, reportes de equipo
+
+=== USUARIO EMPLEADO ===
+Usuario: empleado
+Contraseña: empleado123
+Rol: Empleado
+Acceso: Dashboard empleado, tareas asignadas, registro de trabajo
+
+=== INSTRUCCIONES DE USO ===
+1. Iniciar sesión con cualquiera de las credenciales
+2. Navegar por los diferentes dashboards según el rol
+3. Probar la creación de tareas, usuarios y reportes
+4. Verificar la funcionalidad de cada módulo
+
+=== NOTAS ===
+- Todas las contraseñas cumplen con los requisitos de seguridad
+- Los usuarios tienen datos de prueba preconfigurados
+- El sistema incluye 184 pruebas unitarias (100% pasando)

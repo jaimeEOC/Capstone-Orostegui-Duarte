@@ -98,16 +98,30 @@ class TaskMiniForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
+        # Función para mostrar el nombre del empleado en el select
+        def employee_label(emp):
+            if emp and emp.user:
+                return f"{emp.user.get_full_name()} ({emp.employee_id})"
+            return str(emp)
+        
         # Filtrar empleados por supervisor si el usuario es supervisor
         if user and hasattr(user, 'role') and user.role == 'supervisor':
             # Solo mostrar empleados que tenga bajo supervisión
-            self.fields["assigned_to"].queryset = Employee.objects.filter(
+            queryset = Employee.objects.filter(
                 supervisor=user
-            ).select_related("user").order_by("user__username")
+            ).select_related("user").order_by("user__first_name", "user__last_name", "employee_id")
+            
+            # Si no hay empleados bajo supervisión, mostrar todos los empleados
+            if not queryset.exists():
+                queryset = Employee.objects.select_related("user").order_by("user__first_name", "user__last_name", "employee_id")
         else:
-            self.fields["assigned_to"].queryset = Employee.objects.select_related("user").order_by("user__username")
+            # Para admin o si no es supervisor, mostrar todos los empleados
+            queryset = Employee.objects.select_related("user").order_by("user__first_name", "user__last_name", "employee_id")
         
+        self.fields["assigned_to"].queryset = queryset
+        self.fields["assigned_to"].label_from_instance = employee_label
         self.fields["assigned_to"].label = "Asignar a empleado"
+        self.fields["assigned_to"].empty_label = "Seleccione un empleado..."
         self.fields["estimated_hours"].required = False
         if "status" in self.fields and not self.initial.get("status"):
             self.fields["status"].initial = "pending"

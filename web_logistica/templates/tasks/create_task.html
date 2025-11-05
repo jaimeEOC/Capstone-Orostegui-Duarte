@@ -93,6 +93,11 @@
         <div class="col-md-6">
           <label class="form-label">{{ form.assigned_to.label|default:"Asignar a" }}</label>
           {{ form.assigned_to }}
+          {% if form.assigned_to.queryset.count == 0 %}
+          <div class="alert alert-warning mt-2 small">
+            <i class="fas fa-exclamation-triangle"></i> No hay empleados disponibles. Asegúrate de que existan empleados en el sistema.
+          </div>
+          {% endif %}
           {% for e in form.assigned_to.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
         </div>
 

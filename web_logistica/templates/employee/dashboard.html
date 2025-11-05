@@ -49,7 +49,7 @@
     }
     
     .stat-card {
-        background: #2563eb;
+        background: linear-gradient(135deg, #1e4a72, #3b82f6);
         border-radius: 15px;
         padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -74,12 +74,12 @@
         background: white;
     }
     
-    .stat-icon.tasks { color: #60a5fa; }
-    .stat-icon.completed { color: #34d399; }
-    .stat-icon.packages { color: #f59e0b; }
-    .stat-icon.trucks { color: #8b5cf6; }
-    .stat-icon.quality { color: #ec4899; }
-    .stat-icon.incidents { color: #ef4444; }
+    .stat-icon.tasks { color: #3b82f6; }
+    .stat-icon.completed { color: #3b82f6; }
+    .stat-icon.packages { color: #3b82f6; }
+    .stat-icon.trucks { color: #3b82f6; }
+    .stat-icon.quality { color: #3b82f6; }
+    .stat-icon.incidents { color: #3b82f6; }
     
     .stat-number {
         font-size: 2rem;
@@ -239,7 +239,7 @@
     }
     
     .action-button {
-        background: #2563eb;
+        background: linear-gradient(135deg, #1e4a72, #3b82f6);
         color: white;
         padding: 1.5rem 1rem;
         border-radius: 15px;
@@ -256,8 +256,8 @@
     
     .action-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
-        background: #1d4ed8;
+        box-shadow: 0 6px 12px rgba(30, 74, 114, 0.4);
+        background: linear-gradient(135deg, #1a3d5f, #2563eb);
         color: white;
         text-decoration: none;
     }
@@ -344,7 +344,14 @@
     
     <div class="content-grid">
         <div class="main-content">
-            <h2 class="section-title">Registro de Hoy</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title mb-0">Registro de Hoy</h2>
+                {% if today_log %}
+                <a href="{% url 'performance:edit_work_log' today_log.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> Editar
+                </a>
+                {% endif %}
+            </div>
             {% if today_log %}
             <div class="today-log">
                 <div class="log-item">
@@ -430,7 +437,7 @@
             <span>Ver Mis Tareas</span>
         </a>
         
-        <a href="#" class="action-button" onclick="alert('Módulo de Rendimiento próximamente disponible')">
+        <a href="{% url 'performance:employee_performance' %}" class="action-button">
             <i class="fas fa-chart-bar action-icon"></i>
             <span>Mi Rendimiento</span>
         </a>

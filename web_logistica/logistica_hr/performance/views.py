@@ -7,7 +7,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from datetime import date, timedelta
+from django.utils.safestring import mark_safe
+from django.db.models import Sum, Avg
+import json
+from datetime import date, timedelta, datetime
 
 from logistica_hr.employees.models import Employee
 from .models import DailyWorkLog
@@ -326,14 +329,37 @@ def edit_work_log(request, log_id):
     if request.method == 'POST':
         form = DailyWorkLogForm(request.POST, instance=work_log, employee=employee)
         if form.is_valid():
-            work_log = form.save(commit=False)
-            # Asignar start_time, end_time y total_break_time desde cleaned_data
-            work_log.start_time = form.cleaned_data.get('start_time')
-            work_log.end_time = form.cleaned_data.get('end_time')
-            work_log.total_break_time = form.cleaned_data.get('total_break_time', timedelta(0))
-            work_log.save()
-            messages.success(request, '✅ Registro de trabajo actualizado correctamente.')
-            return redirect('employee_dashboard')
+            # Obtener la fecha del formulario
+            log_date = form.cleaned_data.get('date')
+            
+            # Verificar si ya existe un registro para esta fecha
+            existing_log = DailyWorkLog.objects.filter(
+                employee=employee, 
+                date=log_date
+            ).first()
+            
+            # Si existe un registro para esa fecha y NO es el que estamos editando
+            if existing_log and existing_log.id != work_log.id:
+                form.add_error('date', f'Ya existe un registro para la fecha {log_date.strftime("%d/%m/%Y")}. Por favor, edita el registro existente o elige otra fecha.')
+                messages.error(request, f'❌ Ya existe un registro de trabajo para la fecha {log_date.strftime("%d/%m/%Y")}. Por favor, elige otra fecha o edita el registro existente.')
+            else:
+                work_log = form.save(commit=False)
+                # Asignar start_time, end_time y total_break_time desde cleaned_data
+                work_log.start_time = form.cleaned_data.get('start_time')
+                work_log.end_time = form.cleaned_data.get('end_time')
+                work_log.total_break_time = form.cleaned_data.get('total_break_time', timedelta(0))
+                
+                try:
+                    work_log.save()
+                    messages.success(request, '✅ Registro de trabajo actualizado correctamente.')
+                    return redirect('employee_dashboard')
+                except Exception as e:
+                    error_str = str(e)
+                    if 'UNIQUE constraint' in error_str or 'unique' in error_str.lower():
+                        messages.error(request, f'❌ Ya existe un registro de trabajo para la fecha {log_date.strftime("%d/%m/%Y")}. Este error no debería ocurrir. Por favor, intenta nuevamente.')
+                        form.add_error('date', 'Ya existe un registro para esta fecha.')
+                    else:
+                        messages.error(request, f'❌ Error inesperado al actualizar el registro. Por favor, intenta nuevamente.')
         else:
             messages.error(request, '❌ Por favor, corrige los errores en el formulario.')
     else:
@@ -345,4 +371,140 @@ def edit_work_log(request, log_id):
     }
     
     return render(request, 'performance/create_work_log.html', context)
+
+
+@login_required
+def employee_performance(request):
+    """Vista dedicada para mostrar el rendimiento del empleado"""
+    try:
+        employee = request.user.employee_profile
+    except Employee.DoesNotExist:
+        messages.error(request, 'No se encontró perfil de empleado asociado a tu cuenta.')
+        return redirect('employee_dashboard')
+    
+    today = date.today()
+    
+    # Rendimiento de la semana actual (últimos 7 días, incluyendo hoy)
+    week_ago = today - timedelta(days=6)
+    week_performance = DailyWorkLog.objects.filter(
+        employee=employee,
+        date__gte=week_ago,
+        date__lte=today
+    ).aggregate(
+        total_packages=Sum('packages_processed'),
+        total_trucks=Sum('trucks_received') + Sum('trucks_dispatched'),
+        avg_quality=Avg('quality_score'),
+        total_incidents=Sum('safety_incidents')
+    )
+    
+    # Rendimiento de la semana pasada (para comparación)
+    two_weeks_ago = week_ago - timedelta(days=7)
+    last_week_performance = DailyWorkLog.objects.filter(
+        employee=employee,
+        date__gte=two_weeks_ago,
+        date__lt=week_ago
+    ).aggregate(
+        total_packages=Sum('packages_processed'),
+        total_trucks=Sum('trucks_received') + Sum('trucks_dispatched'),
+        avg_quality=Avg('quality_score'),
+        total_incidents=Sum('safety_incidents')
+    )
+    
+    # Historial detallado (últimos 30 días)
+    month_ago = today - timedelta(days=29)
+    performance_history = DailyWorkLog.objects.filter(
+        employee=employee,
+        date__gte=month_ago,
+        date__lte=today
+    ).order_by('-date')
+    
+    # Preparar datos para gráfico (últimos 30 días)
+    chart_data = {
+        'labels': [],
+        'packages': [],
+        'quality': [],
+        'trucks': []
+    }
+    
+    for i in range(30):
+        day_date = month_ago + timedelta(days=i)
+        if day_date <= today:
+            chart_data['labels'].append(day_date.strftime('%d/%m'))
+            day_log = next((log for log in performance_history if log.date == day_date), None)
+            if day_log:
+                chart_data['packages'].append(day_log.packages_processed or 0)
+                chart_data['quality'].append(float(day_log.quality_score or 0))
+                chart_data['trucks'].append((day_log.trucks_received or 0) + (day_log.trucks_dispatched or 0))
+            else:
+                chart_data['packages'].append(0)
+                chart_data['quality'].append(0)
+                chart_data['trucks'].append(0)
+    
+    # Calcular total de horas trabajadas en la semana
+    week_logs = DailyWorkLog.objects.filter(
+        employee=employee,
+        date__gte=week_ago,
+        date__lte=today
+    )
+    
+    total_hours = 0
+    total_break_hours = 0
+    for log in week_logs:
+        if log.start_time and log.end_time:
+            start = datetime.combine(log.date, log.start_time)
+            end = datetime.combine(log.date, log.end_time)
+            if end < start:
+                end += timedelta(days=1)
+            work_duration = end - start
+            total_hours += work_duration.total_seconds() / 3600
+            if log.total_break_time:
+                total_break_hours += log.total_break_time.total_seconds() / 3600
+    
+    total_work_hours = total_hours - total_break_hours
+    
+    # Calcular diferencias para comparación
+    comparisons = {
+        'packages': {
+            'current': week_performance['total_packages'] or 0,
+            'last': last_week_performance['total_packages'] or 0,
+        },
+        'trucks': {
+            'current': week_performance['total_trucks'] or 0,
+            'last': last_week_performance['total_trucks'] or 0,
+        },
+        'quality': {
+            'current': float(week_performance['avg_quality'] or 0),
+            'last': float(last_week_performance['avg_quality'] or 0),
+        },
+        'incidents': {
+            'current': week_performance['total_incidents'] or 0,
+            'last': last_week_performance['total_incidents'] or 0,
+        },
+    }
+    
+    # Calcular diferencias
+    for key in comparisons:
+        comparisons[key]['difference'] = comparisons[key]['current'] - comparisons[key]['last']
+        comparisons[key]['percent_change'] = 0
+        if comparisons[key]['last'] > 0:
+            comparisons[key]['percent_change'] = (comparisons[key]['difference'] / comparisons[key]['last']) * 100
+    
+    context = {
+        'user': request.user,
+        'employee': employee,
+        'week_performance': week_performance,
+        'last_week_performance': last_week_performance,
+        'performance_history': performance_history,
+        'total_work_hours': round(total_work_hours, 2),
+        'total_break_hours': round(total_break_hours, 2),
+        'comparisons': comparisons,
+        'chart_data': {
+            'labels': mark_safe(json.dumps(chart_data['labels'])),
+            'packages': mark_safe(json.dumps(chart_data['packages'])),
+            'quality': mark_safe(json.dumps(chart_data['quality'])),
+            'trucks': mark_safe(json.dumps(chart_data['trucks'])),
+        },
+    }
+    
+    return render(request, 'performance/employee_performance.html', context)
 

@@ -61,7 +61,6 @@
 
     .form-group {
         margin-bottom: 1.5rem;
-        position: relative;
     }
 
     .form-label {
@@ -72,14 +71,23 @@
         font-size: 0.9rem;
     }
 
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
     .form-input {
         width: 100%;
-        padding: 0.75rem 1rem;
+        padding: 0.875rem 1rem;
+        padding-left: 2.75rem;
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         font-size: 1rem;
         transition: all 0.3s ease;
         background: white;
+        line-height: 1.5;
+        box-sizing: border-box;
     }
 
     .form-input:focus {
@@ -95,11 +103,18 @@
 
     .input-icon {
         position: absolute;
-        right: 1rem;
+        left: 1rem;
         top: 50%;
         transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: #a0aec0;
         font-size: 1.1rem;
+        pointer-events: none;
+        z-index: 1;
+        line-height: 1;
+        height: 1.1rem;
     }
 
     .login-button {
@@ -267,26 +282,30 @@
 
         <div class="form-group">
             <label for="username" class="form-label">Usuario</label>
-            <input type="text"
-                   id="username"
-                   name="username"
-                   class="form-input"
-                   placeholder="Ingresa tu nombre de usuario"
-                   required
-                   autocomplete="username">
-            <i class="fas fa-user input-icon"></i>
+            <div class="input-wrapper">
+                <input type="text"
+                       id="username"
+                       name="username"
+                       class="form-input"
+                       placeholder="Ingresa tu nombre de usuario"
+                       required
+                       autocomplete="username">
+                <i class="fas fa-user input-icon"></i>
+            </div>
         </div>
 
         <div class="form-group">
             <label for="password" class="form-label">Contraseña</label>
-            <input type="password"
-                   id="password"
-                   name="password"
-                   class="form-input"
-                   placeholder="Ingresa tu contraseña"
-                   required
-                   autocomplete="current-password">
-            <i class="fas fa-lock input-icon"></i>
+            <div class="input-wrapper">
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-input"
+                       placeholder="Ingresa tu contraseña"
+                       required
+                       autocomplete="current-password">
+                <i class="fas fa-lock input-icon"></i>
+            </div>
         </div>
 
         <button type="submit" class="login-button" id="loginButton">

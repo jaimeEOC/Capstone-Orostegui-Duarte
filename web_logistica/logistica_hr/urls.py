@@ -17,9 +17,11 @@ urlpatterns = [
     # Panel de administración de Django
     path('admin/', admin.site.urls),
     
+    # Tareas
+    path('tasks/', include('logistica_hr.tasks.urls')),
+    
     # APIs (comentadas temporalmente hasta implementar)
     # path('api/v1/employees/', include('logistica_hr.employees.urls')),
-    # path('api/v1/tasks/', include('logistica_hr.tasks.urls')),
     # path('api/v1/performance/', include('logistica_hr.performance.urls')),
     # path('api/v1/reports/', include('logistica_hr.reports.urls')),
 ]

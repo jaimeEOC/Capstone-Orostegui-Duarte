@@ -96,6 +96,80 @@
             background: var(--primary-color);
             transform: translateY(-2px);
         }
+
+        /* Estilos para el menú desplegable del usuario */
+        .navbar-nav .dropdown-menu {
+            min-width: 200px;
+            right: 0;
+            left: auto;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: none;
+            border-radius: 8px;
+        }
+
+        .navbar-nav .dropdown-item {
+            padding: 0.75rem 1rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-nav .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .navbar-nav .dropdown-toggle {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-nav .dropdown-toggle .user-name-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Responsive para pantallas pequeñas */
+        @media (max-width: 576px) {
+            .navbar-nav .dropdown-toggle {
+                max-width: 150px;
+                font-size: 0.9rem;
+            }
+
+            .navbar-nav .dropdown-menu {
+                min-width: 180px;
+                right: 10px;
+            }
+
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .navbar-nav .dropdown-toggle .user-name-text {
+                max-width: 100px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .navbar-nav .dropdown-toggle {
+                max-width: 120px;
+                font-size: 0.85rem;
+            }
+
+            .navbar-nav .dropdown-toggle .fas {
+                display: none;
+            }
+
+            .navbar-nav .dropdown-toggle .user-name-text {
+                max-width: 80px;
+            }
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -111,13 +185,13 @@
 
             <div class="navbar-nav ms-auto">
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i>
-                        {{ user.username|default:"Usuario" }}
+                    <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle me-1 d-none d-sm-inline"></i>
+                        <span class="user-name-text">{{ user.username|default:"Usuario" }}</span>
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="fas fa-user me-2"></i>Perfil</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="alert('Configuración próximamente disponible')"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="alert('Configuración próximamente disponible'); return false;"><i class="fas fa-cog me-2"></i>Configuración</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
                     </ul>
@@ -173,6 +247,32 @@
                     link.classList.add('active');
                 }
             });
+
+            // Ajustar posición del menú desplegable en pantallas pequeñas
+            const dropdownElement = document.getElementById('userDropdown');
+            if (dropdownElement) {
+                const dropdownMenu = dropdownElement.nextElementSibling;
+                
+                // Asegurar que el menú se posicione correctamente
+                dropdownElement.addEventListener('shown.bs.dropdown', function() {
+                    const rect = dropdownElement.getBoundingClientRect();
+                    const menuRect = dropdownMenu.getBoundingClientRect();
+                    
+                    // Si el menú se sale por la derecha, ajustarlo
+                    if (menuRect.right > window.innerWidth) {
+                        dropdownMenu.style.right = '0';
+                        dropdownMenu.style.left = 'auto';
+                    }
+                    
+                    // Si el menú se sale por abajo, ajustarlo
+                    if (menuRect.bottom > window.innerHeight) {
+                        dropdownMenu.style.bottom = '100%';
+                        dropdownMenu.style.top = 'auto';
+                        dropdownMenu.style.marginBottom = '0.5rem';
+                        dropdownMenu.style.marginTop = '0';
+                    }
+                });
+            }
         });
     </script>
 

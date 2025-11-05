@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.db.models import Count, Avg, Sum
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from logistica_hr.users.models import User
 from logistica_hr.employees.models import Employee, Department
@@ -130,9 +130,34 @@ def employee_dashboard(request):
     """Dashboard para empleados"""
     try:
         employee = request.user.employee_profile
-    except:
+    except Employee.DoesNotExist:
         employee = None
     
+    # Si el usuario tiene rol 'employee' pero no tiene perfil, crearlo automáticamente
+    if not employee and request.user.role == 'employee':
+        # Obtener o crear departamento por defecto
+        department, _ = Department.objects.get_or_create(
+            name='General',
+            defaults={'description': 'Departamento por defecto'}
+        )
+        
+        # Crear perfil de empleado
+        try:
+            employee = Employee.objects.create(
+                user=request.user,
+                employee_id=f"EMP{request.user.id:04d}",
+                position=None,
+                hire_date=date.today(),
+                supervisor=None
+            )
+        except Exception as e:
+            # Si falla la creación, intentar obtener de nuevo
+            try:
+                employee = request.user.employee_profile
+            except Employee.DoesNotExist:
+                employee = None
+    
+    # Si aún no hay perfil, mostrar error (solo para usuarios que no son empleados)
     if not employee:
         context = {
             'user': request.user,

@@ -1,64 +1,54 @@
-{% extends 'base.html' %}
+{% extends 'auth/layout.html' %}
 {% load static %}
 
 {% block title %}Iniciar Sesión - Logistica HR{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <style>
     body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .container {
+        max-width: 500px;
+        width: 100%;
+        padding: 2rem;
     }
 
     .login-container {
         background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        padding: 3rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
         width: 100%;
-        max-width: 400px;
         position: relative;
         overflow: hidden;
     }
 
-    .login-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 5px;
-        background: linear-gradient(90deg, #667eea, #764ba2);
-    }
-
     .logo-section {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .logo-icon {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
         background: linear-gradient(135deg, #667eea, #764ba2);
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 1rem;
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
 
     .logo-icon i {
-        font-size: 2rem;
+        font-size: 1.5rem;
         color: white;
     }
 
     .logo-title {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: #2d3748;
         margin-bottom: 0.5rem;
@@ -84,19 +74,19 @@
 
     .form-input {
         width: 100%;
-        padding: 0.875rem 1rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
         font-size: 1rem;
         transition: all 0.3s ease;
-        background: #f7fafc;
+        background: white;
     }
 
     .form-input:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #3498db;
         background: white;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
     }
 
     .form-input::placeholder {
@@ -115,21 +105,21 @@
     .login-button {
         width: 100%;
         padding: 0.875rem;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: #3498db;
         color: white;
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
+        margin-top: 0.5rem;
     }
-
+    
     .login-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        background: #2980b9;
     }
 
     .login-button:active {
@@ -184,12 +174,17 @@
         border: 1px solid #90cdf4;
     }
 
+    .role-separator {
+        height: 1px;
+        background: #e2e8f0;
+        margin: 1.5rem 0;
+    }
+
     .role-info {
-        background: #f7fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-top: 1.5rem;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin-top: 0;
     }
 
     .role-title {
@@ -228,7 +223,7 @@
     }
 
     .footer-links a {
-        color: #667eea;
+        color: #3498db;
         text-decoration: none;
         font-size: 0.9rem;
         margin: 0 0.5rem;
@@ -236,7 +231,7 @@
     }
 
     .footer-links a:hover {
-        color: #764ba2;
+        color: #2980b9;
         text-decoration: underline;
     }
 
@@ -300,6 +295,8 @@
         </button>
     </form>
 
+    <div class="role-separator"></div>
+
     <div class="role-info">
         <div class="role-title">Roles del Sistema:</div>
         <ul class="role-list">
@@ -310,9 +307,7 @@
     </div>
 
     <div class="footer-links">
-        <a href="{% url 'users:register' %}">¿No tienes cuenta? Regístrate</a>
-        <a href="#" onclick="showHelp()">¿Necesitas ayuda?</a>
-        <a href="#" onclick="showContact()">Contacto</a>
+        <a href="{% url 'users:register' %}">¿No tienes cuenta? Crear una</a>
     </div>
 </div>
 {% endblock %}

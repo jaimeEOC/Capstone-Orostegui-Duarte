@@ -25,5 +25,7 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # Servir archivos de media en desarrollo
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # Los archivos estáticos se sirven automáticamente por django.contrib.staticfiles
+    # cuando DEBUG=True, desde STATICFILES_DIRS

@@ -213,6 +213,19 @@ class DailyWorkLogForm(forms.ModelForm):
         if break_hours > 8:
             raise forms.ValidationError({'break_hours': 'El tiempo de descanso no puede ser mayor a 8 horas.'})
         
+        # Validar que no exista otro registro para esta fecha (solo si no estamos editando)
+        if log_date and self.employee:
+            existing_log = DailyWorkLog.objects.filter(
+                employee=self.employee,
+                date=log_date
+            ).first()
+            
+            # Si existe un registro y no es el que estamos editando
+            if existing_log and (not self.instance or not self.instance.id or existing_log.id != self.instance.id):
+                raise forms.ValidationError({
+                    'date': f'Ya existe un registro de trabajo para la fecha {log_date.strftime("%d/%m/%Y")}. Por favor, edita el registro existente o elige otra fecha.'
+                })
+        
         return cleaned_data
 
 
@@ -225,24 +238,68 @@ def create_work_log(request):
         messages.error(request, 'No se encontró perfil de empleado asociado a tu cuenta.')
         return redirect('employee_dashboard')
     
-    # Obtener o crear registro para hoy
+    # Obtener registro para hoy (si existe)
     today = date.today()
     work_log = DailyWorkLog.objects.filter(employee=employee, date=today).first()
     
     if request.method == 'POST':
         form = DailyWorkLogForm(request.POST, instance=work_log, employee=employee)
         if form.is_valid():
-            work_log = form.save(commit=False)
-            work_log.employee = employee
-            # Asignar start_time, end_time y total_break_time desde cleaned_data
-            work_log.start_time = form.cleaned_data.get('start_time')
-            work_log.end_time = form.cleaned_data.get('end_time')
-            work_log.total_break_time = form.cleaned_data.get('total_break_time', timedelta(0))
-            work_log.save()
-            messages.success(request, '✅ Registro de trabajo guardado correctamente.')
-            return redirect('employee_dashboard')
+            # Obtener la fecha del formulario
+            log_date = form.cleaned_data.get('date')
+            
+            # Verificar si ya existe un registro para esta fecha
+            existing_log = DailyWorkLog.objects.filter(
+                employee=employee, 
+                date=log_date
+            ).first()
+            
+            # Si existe un registro para esa fecha y NO es el que estamos editando
+            if existing_log and (not work_log or existing_log.id != work_log.id):
+                # Mostrar error claro al usuario
+                form.add_error('date', f'Ya existe un registro para la fecha {log_date.strftime("%d/%m/%Y")}. Por favor, edita el registro existente o elige otra fecha.')
+                messages.error(request, f'❌ Ya existe un registro de trabajo para la fecha {log_date.strftime("%d/%m/%Y")}. Por favor, elige otra fecha o edita el registro existente.')
+            else:
+                # Si no existe o es el mismo registro, guardar normalmente
+                work_log = form.save(commit=False)
+                work_log.employee = employee
+                # Asignar start_time, end_time y total_break_time desde cleaned_data
+                work_log.start_time = form.cleaned_data.get('start_time')
+                work_log.end_time = form.cleaned_data.get('end_time')
+                work_log.total_break_time = form.cleaned_data.get('total_break_time', timedelta(0))
+                
+                try:
+                    work_log.save()
+                    if existing_log:
+                        messages.success(request, f'✅ Registro de trabajo actualizado correctamente para {log_date.strftime("%d/%m/%Y")}.')
+                    else:
+                        messages.success(request, f'✅ Registro de trabajo guardado correctamente para {log_date.strftime("%d/%m/%Y")}.')
+                    return redirect('employee_dashboard')
+                except Exception as e:
+                    # Manejar errores de base de datos
+                    import traceback
+                    error_str = str(e)
+                    if 'UNIQUE constraint' in error_str or 'unique' in error_str.lower():
+                        messages.error(request, f'❌ Ya existe un registro de trabajo para la fecha {log_date.strftime("%d/%m/%Y")}. Este error no debería ocurrir. Por favor, intenta nuevamente o contacta al administrador.')
+                        form.add_error('date', 'Ya existe un registro para esta fecha.')
+                    else:
+                        messages.error(request, f'❌ Error inesperado al guardar el registro. Por favor, intenta nuevamente.')
+                        messages.error(request, f'Detalles técnicos: {error_str[:100]}')
+                        # Log del error completo para debugging
+                        print(f"Error completo: {traceback.format_exc()}")
         else:
-            messages.error(request, '❌ Por favor, corrige los errores en el formulario.')
+            # Mostrar errores específicos del formulario
+            error_messages = []
+            for field, errors in form.errors.items():
+                for error in errors:
+                    error_messages.append(f"{field}: {error}")
+            
+            if error_messages:
+                messages.error(request, '❌ Por favor, corrige los siguientes errores:')
+                for msg in error_messages[:5]:  # Mostrar máximo 5 errores
+                    messages.error(request, f'  • {msg}')
+            else:
+                messages.error(request, '❌ Por favor, corrige los errores en el formulario.')
     else:
         form = DailyWorkLogForm(instance=work_log, employee=employee)
     

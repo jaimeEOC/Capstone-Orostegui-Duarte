@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.db.models import Count, Avg, Sum
+from django.utils.safestring import mark_safe
+import json
 from datetime import datetime, timedelta, date
 
 from logistica_hr.users.models import User
@@ -178,10 +180,11 @@ def employee_dashboard(request):
     ).order_by('-created_at')[:10]
     
     # Rendimiento de la semana (últimos 7 días)
-    week_ago = today - timedelta(days=7)
+    week_ago = today - timedelta(days=6)  # 6 días atrás + hoy = 7 días totales
     week_performance = DailyWorkLog.objects.filter(
         employee=employee,
-        date__gte=week_ago
+        date__gte=week_ago,
+        date__lte=today
     ).aggregate(
         total_packages=Sum('packages_processed'),
         total_trucks=Sum('trucks_received') + Sum('trucks_dispatched'),
@@ -194,11 +197,36 @@ def employee_dashboard(request):
     week_performance['my_tasks_pending'] = all_my_tasks.filter(status='pending').count()
     week_performance['my_tasks_completed'] = all_my_tasks.filter(status='completed').count()
     
-    # Historial de rendimiento (últimos 7 días)
+    # Historial de rendimiento (últimos 7 días, incluyendo hoy)
     performance_history = DailyWorkLog.objects.filter(
         employee=employee,
-        date__gte=week_ago
+        date__gte=week_ago,
+        date__lte=today
     ).order_by('date')
+    
+    # Preparar datos para el gráfico (últimos 7 días, desde hace 6 días hasta hoy)
+    chart_data = {
+        'labels': [],
+        'packages': [],
+        'quality': [],
+        'trucks': []
+    }
+    
+    # Generar todos los días desde hace 6 días hasta hoy (7 días totales)
+    for i in range(7):
+        day_date = week_ago + timedelta(days=i)
+        chart_data['labels'].append(day_date.strftime('%d/%m'))
+        
+        # Buscar registro para este día
+        day_log = next((log for log in performance_history if log.date == day_date), None)
+        if day_log:
+            chart_data['packages'].append(day_log.packages_processed or 0)
+            chart_data['quality'].append(float(day_log.quality_score or 0))
+            chart_data['trucks'].append((day_log.trucks_received or 0) + (day_log.trucks_dispatched or 0))
+        else:
+            chart_data['packages'].append(0)
+            chart_data['quality'].append(0)
+            chart_data['trucks'].append(0)
     
     context = {
         'user': request.user,
@@ -207,6 +235,12 @@ def employee_dashboard(request):
         'my_tasks': my_tasks,
         'week_performance': week_performance,
         'performance_history': performance_history,
+        'chart_data': {
+            'labels': mark_safe(json.dumps(chart_data['labels'])),
+            'packages': mark_safe(json.dumps(chart_data['packages'])),
+            'quality': mark_safe(json.dumps(chart_data['quality'])),
+            'trucks': mark_safe(json.dumps(chart_data['trucks'])),
+        },
     }
     
     return render(request, 'employee/dashboard.html', context)

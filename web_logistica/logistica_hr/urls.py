@@ -20,9 +20,11 @@ urlpatterns = [
     # Tareas
     path('tasks/', include('logistica_hr.tasks.urls')),
     
+    # Performance
+    path('performance/', include('logistica_hr.performance.urls')),
+    
     # APIs (comentadas temporalmente hasta implementar)
     # path('api/v1/employees/', include('logistica_hr.employees.urls')),
-    # path('api/v1/performance/', include('logistica_hr.performance.urls')),
     # path('api/v1/reports/', include('logistica_hr.reports.urls')),
 ]
 

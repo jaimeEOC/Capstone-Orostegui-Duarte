@@ -449,7 +449,7 @@
             <span>Mi Perfil</span>
         </a>
         
-        <a href="#" class="action-button" onclick="logWork()">
+        <a href="{% url 'performance:create_work_log' %}" class="action-button">
             <i class="fas fa-clock action-icon"></i>
             <span>Registrar Trabajo</span>
         </a>
@@ -459,10 +459,6 @@
 
 {% block extra_js %}
 <script>
-function logWork() {
-    alert('Función de registro de trabajo próximamente disponible.');
-}
-
 // Actualizar estadísticas cada 30 segundos
 setInterval(function() {
     fetch('/api/dashboard/stats/')

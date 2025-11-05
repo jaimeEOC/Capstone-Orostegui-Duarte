@@ -177,7 +177,7 @@ def employee_dashboard(request):
         assigned_to=employee
     ).order_by('-created_at')[:10]
     
-    # Rendimiento de la semana
+    # Rendimiento de la semana (últimos 7 días)
     week_ago = today - timedelta(days=7)
     week_performance = DailyWorkLog.objects.filter(
         employee=employee,
@@ -188,6 +188,11 @@ def employee_dashboard(request):
         avg_quality=Avg('quality_score'),
         total_incidents=Sum('safety_incidents')
     )
+    
+    # Estadísticas de tareas del empleado
+    all_my_tasks = Task.objects.filter(assigned_to=employee)
+    week_performance['my_tasks_pending'] = all_my_tasks.filter(status='pending').count()
+    week_performance['my_tasks_completed'] = all_my_tasks.filter(status='completed').count()
     
     # Historial de rendimiento (últimos 7 días)
     performance_history = DailyWorkLog.objects.filter(

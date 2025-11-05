@@ -192,7 +192,7 @@ class DailyWorkLog(BaseModel):
         decimal_places=2,
         null=True,
         blank=True,
-        validators=[MinValueValidator(0), MaxValueValidator(1)],
+        validators=[MinValueValidator(0), MaxValueValidator(7)],
         verbose_name=_('Puntaje de Calidad')
     )
     safety_incidents = models.IntegerField(

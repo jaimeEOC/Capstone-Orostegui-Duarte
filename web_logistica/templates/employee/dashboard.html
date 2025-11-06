@@ -12,12 +12,13 @@
     }
     
     .dashboard-header {
-        background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+        background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
         color: white;
         padding: 2rem;
         border-radius: 15px;
         margin-bottom: 2rem;
         text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
     .dashboard-title {
@@ -48,7 +49,7 @@
     }
     
     .stat-card {
-        background: white;
+        background: linear-gradient(135deg, #1e4a72, #3b82f6);
         border-radius: 15px;
         padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -58,35 +59,37 @@
     
     .stat-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
     
     .stat-icon {
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         margin-bottom: 1rem;
+        background: white;
     }
     
-    .stat-icon.tasks { background: #e3f2fd; color: #1976d2; }
-    .stat-icon.completed { background: #e8f5e8; color: #388e3c; }
-    .stat-icon.packages { background: #fff3e0; color: #f57c00; }
-    .stat-icon.trucks { background: #f3e5f5; color: #7b1fa2; }
-    .stat-icon.quality { background: #fce4ec; color: #c2185b; }
-    .stat-icon.incidents { background: #ffebee; color: #d32f2f; }
+    .stat-icon.tasks { color: #3b82f6; }
+    .stat-icon.completed { color: #3b82f6; }
+    .stat-icon.packages { color: #3b82f6; }
+    .stat-icon.trucks { color: #3b82f6; }
+    .stat-icon.quality { color: #3b82f6; }
+    .stat-icon.incidents { color: #3b82f6; }
     
     .stat-number {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: 700;
-        color: #2d3748;
+        color: white;
         margin-bottom: 0.5rem;
     }
     
     .stat-label {
-        color: #718096;
+        color: white;
         font-size: 0.9rem;
         font-weight: 600;
     }
@@ -220,19 +223,13 @@
     .performance-chart {
         background: #f7fafc;
         border-radius: 10px;
-        padding: 1rem;
+        padding: 1.5rem;
         margin-top: 1rem;
+        min-height: 300px;
     }
     
-    .chart-placeholder {
-        height: 200px;
-        background: white;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #a0aec0;
-        font-style: italic;
+    #performanceChart {
+        max-height: 400px !important;
     }
     
     .quick-actions {
@@ -242,10 +239,10 @@
     }
     
     .action-button {
-        background: linear-gradient(135deg, #38a169, #48bb78);
+        background: linear-gradient(135deg, #1e4a72, #3b82f6);
         color: white;
-        padding: 1rem;
-        border-radius: 10px;
+        padding: 1.5rem 1rem;
+        border-radius: 15px;
         text-decoration: none;
         text-align: center;
         font-weight: 600;
@@ -253,18 +250,20 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
     .action-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+        box-shadow: 0 6px 12px rgba(30, 74, 114, 0.4);
+        background: linear-gradient(135deg, #1a3d5f, #2563eb);
         color: white;
         text-decoration: none;
     }
     
     .action-icon {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
     
     @media (max-width: 768px) {
@@ -345,7 +344,14 @@
     
     <div class="content-grid">
         <div class="main-content">
-            <h2 class="section-title">Registro de Hoy</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title mb-0">Registro de Hoy</h2>
+                {% if today_log %}
+                <a href="{% url 'performance:edit_work_log' today_log.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> Editar
+                </a>
+                {% endif %}
+            </div>
             {% if today_log %}
             <div class="today-log">
                 <div class="log-item">
@@ -419,22 +425,19 @@
     <div class="main-content">
         <h2 class="section-title">Mi Rendimiento (Últimos 7 días)</h2>
         <div class="performance-chart">
-            <div class="chart-placeholder">
-                <i class="fas fa-chart-line"></i>
-                Gráfico de rendimiento próximamente
-            </div>
+            <canvas id="performanceChart" style="max-height: 300px;"></canvas>
         </div>
     </div>
     
     {% endif %}
     
     <div class="quick-actions">
-        <a href="#" class="action-button" onclick="alert('Módulo de Tareas próximamente disponible')">
+        <a href="{% url 'tasks:my_tasks' %}" class="action-button">
             <i class="fas fa-tasks action-icon"></i>
             <span>Ver Mis Tareas</span>
         </a>
         
-        <a href="#" class="action-button" onclick="alert('Módulo de Rendimiento próximamente disponible')">
+        <a href="{% url 'performance:employee_performance' %}" class="action-button">
             <i class="fas fa-chart-bar action-icon"></i>
             <span>Mi Rendimiento</span>
         </a>
@@ -444,7 +447,7 @@
             <span>Mi Perfil</span>
         </a>
         
-        <a href="#" class="action-button" onclick="logWork()">
+        <a href="{% url 'performance:create_work_log' %}" class="action-button">
             <i class="fas fa-clock action-icon"></i>
             <span>Registrar Trabajo</span>
         </a>
@@ -453,9 +456,118 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-function logWork() {
-    alert('Función de registro de trabajo próximamente disponible.');
+// Datos del gráfico
+const chartData = {
+    labels: {{ chart_data.labels|safe }},
+    packages: {{ chart_data.packages|safe }},
+    quality: {{ chart_data.quality|safe }},
+    trucks: {{ chart_data.trucks|safe }}
+};
+
+// Crear gráfico de rendimiento
+const ctx = document.getElementById('performanceChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [
+                {
+                    label: 'Paquetes Procesados',
+                    data: chartData.packages,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Calidad Promedio',
+                    data: chartData.quality,
+                    borderColor: 'rgb(236, 72, 153)',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Camiones (Recibidos + Despachados)',
+                    data: chartData.trucks,
+                    borderColor: 'rgb(139, 92, 246)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14
+                    },
+                    bodyFont: {
+                        size: 13
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Día'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Cantidad (Paquetes y Camiones)'
+                    },
+                    beginAtZero: true
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Calidad (0-7)'
+                    },
+                    beginAtZero: true,
+                    max: 7,
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    });
 }
 
 // Actualizar estadísticas cada 30 segundos

@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Empleados del Equipo - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .back-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .employees-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .employee-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .employee-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .employee-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .employee-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+    }
+    
+    .employee-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0;
+    }
+    
+    .employee-position {
+        color: #718096;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+    }
+    
+    .employee-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    .status-active {
+        background: #c6f6d5;
+        color: #2f855a;
+    }
+    
+    .status-inactive {
+        background: #fed7d7;
+        color: #c53030;
+    }
+    
+    .performance-stats {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .stat-label {
+        color: #718096;
+    }
+    
+    .stat-value {
+        color: #2d3748;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Empleados del Equipo</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Gestión de empleados bajo tu supervisión</p>
+        </div>
+        <a href="{% url 'supervisor_dashboard' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+    
+    {% if employees_data %}
+    <div class="employees-grid">
+        {% for data in employees_data %}
+        <div class="employee-card">
+            <div class="employee-header">
+                <div class="employee-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h3 class="employee-name">{{ data.employee.user.full_name }}</h3>
+                    <div class="employee-position">
+                        {% if data.employee.position %}
+                            {{ data.employee.position.name }} - {{ data.employee.position.department.name }}
+                        {% else %}
+                            Sin posición asignada
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="employee-status {% if data.is_active_today %}status-active{% else %}status-inactive{% endif %}">
+                {% if data.is_active_today %}
+                    <i class="fas fa-check-circle"></i> Activo Hoy
+                {% else %}
+                    <i class="fas fa-times-circle"></i> Inactivo Hoy
+                {% endif %}
+            </div>
+            
+            <div class="performance-stats">
+                <div class="stat-row">
+                    <span class="stat-label">Prom. Paquetes/Día:</span>
+                    <span class="stat-value">{{ data.week_performance.avg_packages|floatformat:1|default:"0" }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Calidad Promedio:</span>
+                    <span class="stat-value">{{ data.week_performance.avg_quality|floatformat:2|default:"0" }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Incidentes (7 días):</span>
+                    <span class="stat-value">{{ data.week_performance.total_incidents|default:"0" }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center;">
+        <i class="fas fa-users" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+        <h3 style="color: #4a5568;">No hay empleados asignados</h3>
+        <p style="color: #718096;">No tienes empleados bajo tu supervisión actualmente.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

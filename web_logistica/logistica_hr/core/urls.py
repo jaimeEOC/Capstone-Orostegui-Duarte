@@ -17,14 +17,12 @@ urlpatterns = [
     # Páginas de error y acceso
     path('access-denied/', views.access_denied_view, name='access_denied'),
     
-    # Páginas de contenido (temporalmente comentadas hasta implementar)
-    # path('employees/', views.employees_list, name='employees_list'),  # Lista de empleados
-    # path('tasks/', views.tasks_list, name='tasks_list'),  # Lista de tareas
-    # path('performance/', views.performance_dashboard, name='performance_dashboard'),  # Dashboard de rendimiento
-    # path('reports/', views.reports_list, name='reports_list'),  # Lista de reportes
+    # Supervisor - Gestión de equipo
+    path('supervisor/employees/', views.supervisor_employees_list, name='supervisor_employees_list'),
+    path('supervisor/reports/', views.supervisor_team_reports, name='supervisor_team_reports'),
+    path('supervisor/evaluate/', views.supervisor_evaluate_performance, name='supervisor_evaluate_performance'),
+    path('supervisor/evaluate/<int:employee_id>/', views.supervisor_evaluate_performance, name='supervisor_evaluate_employee'),
     
-    # API endpoints (temporalmente comentadas hasta implementar)
-    # path('api/v1/', views.api_root, name='api-root'),  # API root
-    # path('api/v1/health/', views.health_check, name='health-check'),
+    # API endpoints
     path('api/dashboard/stats/', views.api_dashboard_stats, name='api_dashboard_stats'),
 ]

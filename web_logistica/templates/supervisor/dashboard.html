@@ -84,6 +84,69 @@
         font-weight: 600;
     }
     
+    .stat-change {
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    
+    .stat-change.positive {
+        color: #34d399;
+    }
+    
+    .stat-change.negative {
+        color: #fca5a5;
+    }
+    
+    .stat-change.neutral {
+        color: #d1d5db;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .task-item.overdue {
+        border-left: 4px solid #ef4444;
+        background-color: #fef2f2;
+    }
+    
+    .task-item.overdue:hover {
+        background-color: #fee2e2;
+    }
+    
+    .comparison-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .comparison-badge.positive {
+        background: rgba(52, 211, 153, 0.2);
+        color: #10b981;
+    }
+    
+    .comparison-badge.negative {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+    
+    .comparison-badge.neutral {
+        background: rgba(209, 213, 219, 0.2);
+        color: #6b7280;
+    }
+    
     .content-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -120,11 +183,23 @@
         border: 1px solid #e2e8f0;
         border-radius: 10px;
         margin-bottom: 0.5rem;
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
     }
     
     .employee-item:hover {
         background-color: #f7fafc;
+        border-color: #3b82f6;
+        transform: translateX(5px);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .employee-item-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
     }
     
     .employee-avatar {
@@ -185,11 +260,22 @@
         border: 1px solid #e2e8f0;
         border-radius: 10px;
         margin-bottom: 0.5rem;
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
     
     .task-item:hover {
         background-color: #f7fafc;
+        border-color: #3b82f6;
+        transform: translateX(3px);
+    }
+    
+    .task-item-link {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        text-decoration: none;
+        color: inherit;
     }
     
     .task-priority {
@@ -340,6 +426,12 @@
             </div>
             <div class="stat-number">{{ team_performance.avg_packages|floatformat:1|default:"0" }}</div>
             <div class="stat-label">Prom. Paquetes/Día</div>
+            {% if performance_comparison.packages_change != 0 %}
+            <div class="stat-change {% if performance_comparison.packages_change > 0 %}positive{% else %}negative{% endif %}">
+                <i class="fas fa-arrow-{% if performance_comparison.packages_change > 0 %}up{% else %}down{% endif %}"></i>
+                {{ performance_comparison.packages_change_abs|floatformat:1 }}% vs semana pasada
+            </div>
+            {% endif %}
         </div>
         
         <div class="stat-card">
@@ -348,6 +440,12 @@
             </div>
             <div class="stat-number">{{ team_performance.avg_quality|floatformat:2|default:"0" }}</div>
             <div class="stat-label">Calidad Promedio</div>
+            {% if performance_comparison.quality_change != 0 %}
+            <div class="stat-change {% if performance_comparison.quality_change > 0 %}positive{% else %}negative{% endif %}">
+                <i class="fas fa-arrow-{% if performance_comparison.quality_change > 0 %}up{% else %}down{% endif %}"></i>
+                {{ performance_comparison.quality_change_abs|floatformat:1 }}% vs semana pasada
+            </div>
+            {% endif %}
         </div>
         
         <div class="stat-card">
@@ -356,31 +454,57 @@
             </div>
             <div class="stat-number">{{ team_performance.total_incidents|default:"0" }}</div>
             <div class="stat-label">Incidentes (7 días)</div>
+            {% if performance_comparison.incidents_change != 0 %}
+            <div class="stat-change {% if performance_comparison.incidents_change < 0 %}positive{% else %}negative{% endif %}">
+                <i class="fas fa-arrow-{% if performance_comparison.incidents_change < 0 %}down{% else %}up{% endif %}"></i>
+                {{ performance_comparison.incidents_change_abs|floatformat:1 }}% vs semana pasada
+            </div>
+            {% endif %}
         </div>
+    </div>
+    
+    <!-- Gráfico de Rendimiento -->
+    <div class="chart-container">
+        <h2 class="section-title">Tendencias de Rendimiento (30 días)</h2>
+        <canvas id="performanceChart" style="max-height: 300px;"></canvas>
     </div>
     
     <div class="content-grid">
         <div class="main-content">
             <h2 class="section-title">Mi Equipo</h2>
             <ul class="employee-list">
-                {% for employee in supervised_employees %}
+                {% for data in employees_with_status %}
                 <li class="employee-item">
-                    <div class="employee-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="employee-info">
-                        <div class="employee-name">{{ employee.user.full_name }}</div>
-                        <div class="employee-position">
-                            {% if employee.position %}
-                                {{ employee.position.name }} - {{ employee.position.department.name }}
-                            {% else %}
-                                Sin posición asignada
+                    <a href="{% url 'supervisor_evaluate_employee' data.employee.id %}" class="employee-item-link" style="display: flex; align-items: center; width: 100%; text-decoration: none; color: inherit;">
+                        <div class="employee-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="employee-info" style="flex: 1;">
+                            <div class="employee-name">{{ data.employee.user.full_name }}</div>
+                            <div class="employee-position">
+                                {% if data.employee.position %}
+                                    {{ data.employee.position.name }} - {{ data.employee.position.department.name }}
+                                {% else %}
+                                    Sin posición asignada
+                                {% endif %}
+                            </div>
+                            {% if data.week_performance.avg_packages %}
+                            <div style="font-size: 0.8rem; color: #718096; margin-top: 0.25rem;">
+                                <i class="fas fa-box"></i> {{ data.week_performance.avg_packages|floatformat:1 }} paq/día
+                                <span style="margin-left: 0.5rem;">
+                                    <i class="fas fa-star"></i> {{ data.week_performance.avg_quality|floatformat:1|default:"N/A" }}
+                                </span>
+                            </div>
                             {% endif %}
                         </div>
-                    </div>
-                    <div class="employee-status status-active">
-                        Activo
-                    </div>
+                        <div class="employee-status {% if data.is_active_today %}status-active{% else %}status-inactive{% endif %}">
+                            {% if data.is_active_today %}
+                                <i class="fas fa-check-circle"></i> Activo Hoy
+                            {% else %}
+                                <i class="fas fa-times-circle"></i> Inactivo
+                            {% endif %}
+                        </div>
+                    </a>
                 </li>
                 {% empty %}
                 <li class="employee-item">
@@ -393,18 +517,58 @@
         </div>
         
         <div class="main-content">
-            <h2 class="section-title">Tareas Pendientes</h2>
+            <h2 class="section-title">Tareas</h2>
+            
+            {% if overdue_tasks %}
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1rem; color: #ef4444; margin-bottom: 0.75rem; font-weight: 600;">
+                    <i class="fas fa-exclamation-circle"></i> Tareas Vencidas ({{ task_stats.total_overdue }})
+                </h3>
+                <ul class="task-list">
+                    {% for task in overdue_tasks %}
+                    <li class="task-item overdue">
+                        <a href="{% url 'tasks:my_tasks' %}" class="task-item-link">
+                            <div class="task-priority priority-{{ task.priority }}"></div>
+                            <div class="task-content" style="flex: 1;">
+                                <div class="task-title">{{ task.title }}</div>
+                                <div class="task-assigned">
+                                    <i class="fas fa-user"></i> {{ task.assigned_to.user.full_name }}
+                                    <span style="margin-left: 1rem; color: #ef4444;">
+                                        <i class="fas fa-calendar-times"></i> Vence: {{ task.due_date|date:"d/m/Y" }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="task-status status-{{ task.status }}">
+                                {{ task.get_status_display }}
+                            </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <h3 style="font-size: 1rem; color: #2d3748; margin-bottom: 0.75rem; font-weight: 600;">Pendientes</h3>
             <ul class="task-list">
                 {% for task in pending_tasks %}
                 <li class="task-item">
-                    <div class="task-priority priority-{{ task.priority }}"></div>
-                    <div class="task-content">
-                        <div class="task-title">{{ task.title }}</div>
-                        <div class="task-assigned">{{ task.assigned_to.user.full_name }}</div>
-                    </div>
-                    <div class="task-status status-{{ task.status }}">
-                        {{ task.get_status_display }}
-                    </div>
+                    <a href="{% url 'tasks:my_tasks' %}" class="task-item-link">
+                        <div class="task-priority priority-{{ task.priority }}"></div>
+                        <div class="task-content" style="flex: 1;">
+                            <div class="task-title">{{ task.title }}</div>
+                            <div class="task-assigned">
+                                <i class="fas fa-user"></i> {{ task.assigned_to.user.full_name }}
+                                {% if task.due_date %}
+                                <span style="margin-left: 1rem; color: #718096;">
+                                    <i class="fas fa-calendar"></i> Vence: {{ task.due_date|date:"d/m/Y" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="task-status status-{{ task.status }}">
+                            {{ task.get_status_display }}
+                        </div>
+                    </a>
                 </li>
                 {% empty %}
                 <li class="task-item">
@@ -416,25 +580,69 @@
             </ul>
             
             <div class="performance-summary">
+                <h3 style="margin-bottom: 1rem; color: #2d3748;">Resumen de Tareas</h3>
+                <div class="performance-item">
+                    <span class="performance-label">Pendientes:</span>
+                    <span class="performance-value">{{ task_stats.total_pending }}</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance-label">En Progreso:</span>
+                    <span class="performance-value">{{ task_stats.total_in_progress }}</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance-label">Completadas (7 días):</span>
+                    <span class="performance-value">{{ task_stats.total_completed_week }}</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance-label">Vencidas:</span>
+                    <span class="performance-value" style="color: #ef4444;">{{ task_stats.total_overdue }}</span>
+                </div>
+            </div>
+            
+            <div class="performance-summary" style="margin-top: 1rem;">
                 <h3 style="margin-bottom: 1rem; color: #2d3748;">Rendimiento del Equipo (7 días)</h3>
                 <div class="performance-item">
-                    <span class="performance-label">Paquetes Procesados:</span>
-                    <span class="performance-value">{{ team_performance.avg_packages|floatformat:0|default:"0" }}</span>
+                    <span class="performance-label">Prom. Paquetes/Día:</span>
+                    <span class="performance-value">
+                        {{ team_performance.avg_packages|floatformat:1|default:"0" }}
+                        {% if performance_comparison.packages_change != 0 %}
+                        <span class="comparison-badge {% if performance_comparison.packages_change > 0 %}positive{% else %}negative{% endif %}">
+                            <i class="fas fa-arrow-{% if performance_comparison.packages_change > 0 %}up{% else %}down{% endif %}"></i>
+                            {{ performance_comparison.packages_change_abs|floatformat:1 }}%
+                        </span>
+                        {% endif %}
+                    </span>
                 </div>
                 <div class="performance-item">
                     <span class="performance-label">Calidad Promedio:</span>
-                    <span class="performance-value">{{ team_performance.avg_quality|floatformat:2|default:"0" }}</span>
+                    <span class="performance-value">
+                        {{ team_performance.avg_quality|floatformat:2|default:"0" }}
+                        {% if performance_comparison.quality_change != 0 %}
+                        <span class="comparison-badge {% if performance_comparison.quality_change > 0 %}positive{% else %}negative{% endif %}">
+                            <i class="fas fa-arrow-{% if performance_comparison.quality_change > 0 %}up{% else %}down{% endif %}"></i>
+                            {{ performance_comparison.quality_change_abs|floatformat:1 }}%
+                        </span>
+                        {% endif %}
+                    </span>
                 </div>
                 <div class="performance-item">
-                    <span class="performance-label">Incidentes:</span>
-                    <span class="performance-value">{{ team_performance.total_incidents|default:"0" }}</span>
+                    <span class="performance-label">Total Incidentes:</span>
+                    <span class="performance-value">
+                        {{ team_performance.total_incidents|default:"0" }}
+                        {% if performance_comparison.incidents_change != 0 %}
+                        <span class="comparison-badge {% if performance_comparison.incidents_change < 0 %}positive{% else %}negative{% endif %}">
+                            <i class="fas fa-arrow-{% if performance_comparison.incidents_change < 0 %}down{% else %}up{% endif %}"></i>
+                            {{ performance_comparison.incidents_change_abs|floatformat:1 }}%
+                        </span>
+                        {% endif %}
+                    </span>
                 </div>
             </div>
         </div>
     </div>
     
     <div class="quick-actions">
-        <a href="#" class="action-button" onclick="alert('Módulo de Empleados próximamente disponible')">
+        <a href="{% url 'supervisor_employees_list' %}" class="action-button">
             <i class="fas fa-users action-icon"></i>
             <span>Gestionar Empleados</span>
         </a>
@@ -444,12 +652,12 @@
             <span>Crear Tarea</span>
         </a>
         
-        <a href="#" class="action-button" onclick="alert('Módulo de Reportes próximamente disponible')">
+        <a href="{% url 'supervisor_team_reports' %}" class="action-button">
             <i class="fas fa-chart-bar action-icon"></i>
             <span>Ver Reportes</span>
         </a>
         
-        <a href="#" class="action-button" onclick="alert('Módulo de Rendimiento próximamente disponible')">
+        <a href="{% url 'supervisor_evaluate_performance' %}" class="action-button">
             <i class="fas fa-tachometer-alt action-icon"></i>
             <span>Evaluar Rendimiento</span>
         </a>
@@ -458,7 +666,92 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script>
+// Datos del gráfico
+const chartData = {{ chart_data_json|safe }};
+
+// Configurar gráfico de rendimiento
+const ctx = document.getElementById('performanceChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.dates.map(date => {
+                const d = new Date(date);
+                return d.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+            }),
+            datasets: [
+                {
+                    label: 'Paquetes Procesados',
+                    data: chartData.packages,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.4
+                },
+                {
+                    label: 'Calidad Promedio',
+                    data: chartData.quality,
+                    borderColor: '#ec4899',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.4
+                },
+                {
+                    label: 'Incidentes',
+                    data: chartData.incidents,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.4,
+                    type: 'bar'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Paquetes / Incidentes'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Calidad (0-7)'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
+        }
+    });
+}
+
 // Actualizar estadísticas cada 30 segundos
 setInterval(function() {
     fetch('/api/dashboard/stats/')

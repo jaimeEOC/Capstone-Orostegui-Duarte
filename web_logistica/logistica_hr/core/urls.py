@@ -17,6 +17,10 @@ urlpatterns = [
     # Páginas de error y acceso
     path('access-denied/', views.access_denied_view, name='access_denied'),
     
+    # Admin - Gestión de empleados
+    path('admin/employees/', views.admin_employees_list, name='admin_employees_list'),
+    path('admin/employees/<int:employee_id>/assign-supervisor/', views.admin_assign_supervisor, name='admin_assign_supervisor'),
+    
     # Supervisor - Gestión de equipo
     path('supervisor/employees/', views.supervisor_employees_list, name='supervisor_employees_list'),
     path('supervisor/reports/', views.supervisor_team_reports, name='supervisor_team_reports'),

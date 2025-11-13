@@ -2,18 +2,19 @@
 Vistas principales del sistema Logistica HR
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Count, Avg, Sum
+from django.db.models import Count, Avg, Sum, Q
 from django.utils.safestring import mark_safe
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from datetime import datetime, timedelta, date
 
 from logistica_hr.users.models import User
-from logistica_hr.employees.models import Employee, Department
+from logistica_hr.employees.models import Employee
 from logistica_hr.tasks.models import Task
 from logistica_hr.performance.models import DailyWorkLog, EmployeePerformance
 
@@ -37,7 +38,7 @@ def admin_dashboard(request):
     # Estadísticas generales
     total_users = User.objects.count()
     total_employees = Employee.objects.count()
-    total_departments = Department.objects.count()
+    total_supervisors = User.objects.filter(role='supervisor').count()
     
     # Estadísticas de hoy
     today = datetime.now().date()
@@ -54,30 +55,151 @@ def admin_dashboard(request):
     # Empleados activos hoy
     active_employees_today = today_logs.count()
     
-    # Departamentos con más empleados
-    departments_stats = Department.objects.annotate(
-        employee_count=Count('positions__employees')
-    ).order_by('-employee_count')[:5]
+    # Estadísticas de la semana
+    week_ago = today - timedelta(days=7)
+    week_logs = DailyWorkLog.objects.filter(date__gte=week_ago)
+    total_packages_week = week_logs.aggregate(total=Sum('packages_processed'))['total'] or 0
+    avg_quality_week = week_logs.aggregate(avg=Avg('quality_score'))['avg'] or 0
     
-    # Últimas actividades (simulado)
-    recent_activities = [
-        {'action': 'Nuevo empleado registrado', 'user': 'Juan Pérez', 'time': 'Hace 2 horas'},
-        {'action': 'Tarea completada', 'user': 'María González', 'time': 'Hace 3 horas'},
-        {'action': 'Reporte generado', 'user': 'Carlos López', 'time': 'Hace 4 horas'},
-    ]
+    # Tareas
+    total_tasks = Task.objects.count()
+    pending_tasks = Task.objects.filter(status='pending').count()
+    overdue_tasks = Task.objects.filter(
+        status__in=['pending', 'in_progress'],
+        due_date__lt=datetime.now()
+    ).count()
+    
+    # Actividades recientes reales
+    recent_activities = []
+    
+    # Empleados recientemente creados (últimos 7 días)
+    recent_employees = Employee.objects.filter(
+        created_at__gte=week_ago
+    ).select_related('user').order_by('-created_at')[:5]
+    for emp in recent_employees:
+        time_diff = datetime.now() - emp.created_at.replace(tzinfo=None)
+        hours_ago = int(time_diff.total_seconds() / 3600)
+        if hours_ago < 1:
+            time_str = 'Hace menos de 1 hora'
+            sort_key = 0
+        elif hours_ago < 24:
+            time_str = f'Hace {hours_ago} horas'
+            sort_key = hours_ago
+        else:
+            days_ago = hours_ago // 24
+            time_str = f'Hace {days_ago} días'
+            sort_key = days_ago * 24
+        
+        # Convertir a timezone-naive para evitar problemas de comparación
+        timestamp = emp.created_at
+        if timestamp.tzinfo is not None:
+            timestamp = timestamp.replace(tzinfo=None)
+        
+        recent_activities.append({
+            'action': 'Nuevo empleado registrado',
+            'user': emp.user.full_name,
+            'time': time_str,
+            'icon': 'user-plus',
+            'color': '#4caf50',
+            'sort_key': sort_key,
+            'timestamp': timestamp
+        })
+    
+    # Tareas completadas recientemente (últimos 7 días)
+    recent_completed_tasks = Task.objects.filter(
+        status='completed',
+        updated_at__gte=week_ago
+    ).select_related('assigned_to__user', 'assigned_by').order_by('-updated_at')[:5]
+    for task in recent_completed_tasks:
+        time_diff = datetime.now() - task.updated_at.replace(tzinfo=None)
+        hours_ago = int(time_diff.total_seconds() / 3600)
+        if hours_ago < 1:
+            time_str = 'Hace menos de 1 hora'
+            sort_key = 0
+        elif hours_ago < 24:
+            time_str = f'Hace {hours_ago} horas'
+            sort_key = hours_ago
+        else:
+            days_ago = hours_ago // 24
+            time_str = f'Hace {days_ago} días'
+            sort_key = days_ago * 24
+        
+        # Convertir a timezone-naive para evitar problemas de comparación
+        timestamp = task.updated_at
+        if timestamp.tzinfo is not None:
+            timestamp = timestamp.replace(tzinfo=None)
+        
+        recent_activities.append({
+            'action': f'Tarea completada: {task.title[:30]}',
+            'user': task.assigned_to.user.full_name if task.assigned_to else 'Desconocido',
+            'time': time_str,
+            'icon': 'check-circle',
+            'color': '#2196f3',
+            'sort_key': sort_key,
+            'timestamp': timestamp
+        })
+    
+    # Registros de trabajo de hoy
+    today_work_logs = DailyWorkLog.objects.filter(date=today).select_related('employee__user')[:3]
+    for log in today_work_logs:
+        recent_activities.append({
+            'action': f'Registro de trabajo: {log.packages_processed} paquetes procesados',
+            'user': log.employee.user.full_name,
+            'time': 'Hoy',
+            'icon': 'clipboard-check',
+            'color': '#ff9800',
+            'sort_key': -1,  # Hoy es más reciente
+            'timestamp': datetime.combine(today, datetime.min.time())
+        })
+    
+    # Ordenar por timestamp (más recientes primero)
+    # Asegurar que todos los timestamps sean timezone-naive
+    for activity in recent_activities:
+        if 'timestamp' in activity and activity['timestamp'] is not None:
+            if hasattr(activity['timestamp'], 'tzinfo') and activity['timestamp'].tzinfo is not None:
+                activity['timestamp'] = activity['timestamp'].replace(tzinfo=None)
+    
+    recent_activities.sort(key=lambda x: x.get('timestamp') or datetime.min, reverse=True)
+    recent_activities = recent_activities[:10]  # Limitar a 10 actividades
+    
+    # Tareas pendientes y vencidas
+    urgent_tasks = Task.objects.filter(
+        status__in=['pending', 'in_progress'],
+        due_date__lt=datetime.now() + timedelta(days=1)
+    ).select_related('assigned_to__user', 'assigned_by').order_by('due_date')[:5]
+    
+    # Empleados recientes
+    new_employees = Employee.objects.select_related('user', 'supervisor').order_by('-created_at')[:5]
+    
+    # Supervisores y sus equipos
+    supervisors_with_teams = []
+    supervisors = User.objects.filter(role='supervisor').select_related()
+    for supervisor in supervisors:
+        team_count = Employee.objects.filter(supervisor=supervisor).count()
+        supervisors_with_teams.append({
+            'supervisor': supervisor,
+            'team_count': team_count
+        })
     
     context = {
         'user': request.user,
         'stats': {
             'total_users': total_users,
             'total_employees': total_employees,
-            'total_departments': total_departments,
+            'total_supervisors': total_supervisors,
             'total_packages_today': total_packages_today,
+            'total_packages_week': total_packages_week,
             'total_trucks_today': total_trucks_today,
             'active_employees_today': active_employees_today,
+            'avg_quality_week': round(avg_quality_week, 2) if avg_quality_week else 0,
+            'total_tasks': total_tasks,
+            'pending_tasks': pending_tasks,
+            'overdue_tasks': overdue_tasks,
         },
-        'departments_stats': departments_stats,
         'recent_activities': recent_activities,
+        'urgent_tasks': urgent_tasks,
+        'new_employees': new_employees,
+        'supervisors_with_teams': supervisors_with_teams,
     }
     
     return render(request, 'admin/dashboard.html', context)
@@ -87,11 +209,14 @@ def admin_dashboard(request):
 def supervisor_dashboard(request):
     """Dashboard para supervisores"""
     today = datetime.now().date()
+    week_ago = today - timedelta(days=7)
+    two_weeks_ago = today - timedelta(days=14)
+    thirty_days_ago = today - timedelta(days=30)
     
     # Empleados bajo supervisión con información de estado
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
-    ).select_related('user', 'position', 'position__department')
+    ).select_related('user', 'position')
     
     # Agregar información de estado y rendimiento a cada empleado
     employees_with_status = []
@@ -140,7 +265,6 @@ def supervisor_dashboard(request):
     ).select_related('assigned_to__user')[:5]
     
     # Rendimiento del equipo - Semana actual (últimos 7 días)
-    week_ago = today - timedelta(days=7)
     current_week_performance = DailyWorkLog.objects.filter(
         employee__supervisor=request.user,
         date__gte=week_ago,
@@ -263,12 +387,6 @@ def employee_dashboard(request):
     
     # Si el usuario tiene rol 'employee' pero no tiene perfil, crearlo automáticamente
     if not employee and request.user.role == 'employee':
-        # Obtener o crear departamento por defecto
-        department, _ = Department.objects.get_or_create(
-            name='General',
-            defaults={'description': 'Departamento por defecto'}
-        )
-        
         # Crear perfil de empleado
         try:
             employee = Employee.objects.create(
@@ -372,6 +490,120 @@ def employee_dashboard(request):
     return render(request, 'employee/dashboard.html', context)
 
 
+@login_required
+def admin_employees_list(request):
+    """Lista de todos los empleados para administradores"""
+    if not request.user.is_admin():
+        return redirect('access_denied')
+    
+    # Obtener todos los empleados con información relacionada
+    all_employees = Employee.objects.select_related(
+        'user', 'position', 'supervisor'
+    ).order_by('user__first_name', 'user__last_name')
+    
+    # Filtros
+    search_query = request.GET.get('search', '')
+    supervisor_filter = request.GET.get('supervisor', '')
+    
+    if search_query:
+        all_employees = all_employees.filter(
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query) |
+            Q(user__email__icontains=search_query) |
+            Q(employee_id__icontains=search_query)
+        )
+    
+    if supervisor_filter:
+        all_employees = all_employees.filter(supervisor_id=supervisor_filter)
+    
+    # Estadísticas por empleado
+    today = datetime.now().date()
+    week_ago = today - timedelta(days=7)
+    
+    employees_data = []
+    for employee in all_employees:
+        # Registro de hoy
+        today_log = DailyWorkLog.objects.filter(
+            employee=employee,
+            date=today
+        ).first()
+        
+        # Rendimiento de la semana
+        week_performance = DailyWorkLog.objects.filter(
+            employee=employee,
+            date__gte=week_ago
+        ).aggregate(
+            avg_packages=Avg('packages_processed'),
+            avg_quality=Avg('quality_score'),
+            total_incidents=Sum('safety_incidents')
+        )
+        
+        employees_data.append({
+            'employee': employee,
+            'is_active_today': today_log is not None,
+            'week_performance': week_performance,
+        })
+    
+    # Obtener supervisores para filtros
+    supervisors = User.objects.filter(role='supervisor').order_by('first_name', 'last_name')
+    
+    context = {
+        'user': request.user,
+        'employees_data': employees_data,
+        'supervisors': supervisors,
+        'search_query': search_query,
+        'supervisor_filter': supervisor_filter,
+    }
+    
+    return render(request, 'admin/employees_list.html', context)
+
+
+@login_required
+def admin_assign_supervisor(request, employee_id):
+    """Asignar supervisor a un empleado"""
+    if not request.user.is_admin():
+        return redirect('access_denied')
+    
+    try:
+        employee = Employee.objects.get(id=employee_id)
+    except Employee.DoesNotExist:
+        messages.error(request, 'Empleado no encontrado.')
+        return redirect('admin_employees_list')
+    
+    if request.method == 'POST':
+        supervisor_id = request.POST.get('supervisor_id')
+        if supervisor_id:
+            try:
+                supervisor = User.objects.get(id=supervisor_id, role='supervisor')
+                employee.supervisor = supervisor
+                employee.save()
+                # Refrescar desde la base de datos para asegurar que se guardó correctamente
+                employee.refresh_from_db()
+                messages.success(request, f'Supervisor asignado correctamente a {employee.user.full_name}.')
+            except User.DoesNotExist:
+                messages.error(request, 'Supervisor no encontrado.')
+        else:
+            # Remover supervisor
+            employee.supervisor = None
+            employee.save()
+            # Refrescar desde la base de datos
+            employee.refresh_from_db()
+            messages.success(request, f'Supervisor removido de {employee.user.full_name}.')
+        
+        return redirect('admin_employees_list')
+    
+    # Obtener supervisores disponibles
+    supervisors = User.objects.filter(role='supervisor').order_by('first_name', 'last_name')
+    
+    context = {
+        'user': request.user,
+        'employee': employee,
+        'supervisors': supervisors,
+    }
+    
+    return render(request, 'admin/assign_supervisor.html', context)
+
+
 def access_denied_view(request):
     """Vista para mostrar página de acceso restringido"""
     return render(request, 'auth/access_denied.html', {
@@ -382,9 +614,13 @@ def access_denied_view(request):
 @login_required
 def supervisor_employees_list(request):
     """Lista de empleados supervisados"""
+    if not request.user.is_supervisor():
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('access_denied')
+    
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
-    ).select_related('user', 'position', 'position__department').order_by('user__first_name', 'user__last_name')
+    ).select_related('user', 'position').order_by('user__first_name', 'user__last_name')
     
     # Estadísticas por empleado
     today = datetime.now().date()
@@ -425,6 +661,10 @@ def supervisor_employees_list(request):
 @login_required
 def supervisor_team_reports(request):
     """Reportes del equipo para supervisor"""
+    if not request.user.is_supervisor():
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('access_denied')
+    
     today = datetime.now().date()
     week_ago = today - timedelta(days=7)
     month_ago = today - timedelta(days=30)
@@ -495,6 +735,10 @@ def supervisor_team_reports(request):
 @login_required
 def supervisor_evaluate_performance(request, employee_id=None):
     """Evaluar rendimiento de empleados"""
+    if not request.user.is_supervisor():
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('access_denied')
+    
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
     ).select_related('user', 'position')

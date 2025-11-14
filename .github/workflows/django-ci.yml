@@ -50,7 +50,7 @@ jobs:
       working-directory: web_logistica
       env:
         DJANGO_SETTINGS_MODULE: logistica_hr.settings.development
-      run: python manage.py test --verbosity=2
+      run: pytest --verbose
 
   lint:
     runs-on: ubuntu-latest

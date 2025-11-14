@@ -191,3 +191,15 @@ LOGGING = {
 
 # WhiteNoise configuration for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Session configuration
+# IMPORTANTE: Las cookies de sesión son compartidas entre todas las pestañas del mismo navegador.
+# Si necesitas trabajar con múltiples usuarios simultáneamente, usa diferentes navegadores
+# o perfiles de navegador (modo incógnito, perfiles separados, etc.)
+SESSION_COOKIE_NAME = 'logistica_hr_sessionid'
+SESSION_COOKIE_AGE = 86400  # 24 horas en segundos
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = False  # True en producción con HTTPS
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # La sesión persiste después de cerrar el navegador

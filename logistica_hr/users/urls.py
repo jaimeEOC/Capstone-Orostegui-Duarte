@@ -2,15 +2,11 @@
 URLs para la aplicación users
 """
 
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from . import views
 from .views import RegisterView
 
 app_name = 'users'
-
-router = DefaultRouter()
-# router.register(r'', views.UserViewSet)  # Comentado hasta crear las vistas
 
 urlpatterns = [
     # Vistas de autenticación
@@ -24,7 +20,4 @@ urlpatterns = [
     path('api/login/', views.api_login, name='api_login'),
     path('api/logout/', views.api_logout, name='api_logout'),
     path('api/profile/', views.api_profile, name='api_profile'),
-    
-    # Incluir URLs del router
-    path('', include(router.urls)),
 ]

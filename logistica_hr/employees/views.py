@@ -1,17 +1,10 @@
 """
 Vistas para la aplicación employees
 """
-from django.http import JsonResponse, HttpResponseForbidden
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from django.shortcuts import render
-from django.db.models import Q
-
 # DRF
 from rest_framework import viewsets, permissions, filters
 
 from .models import Department, Position, Employee, WorkSchedule
-from logistica_hr.tasks.models import Task
 
 # === DRF Serializers (usa los tuyos si ya existen) ===========================
 # Si YA tienes serializers.py, descomenta estas dos líneas e importa desde ahí:
@@ -51,55 +44,6 @@ except Exception:
         class Meta:
             model = WorkSchedule
             fields = "__all__"
-
-
-# === Dashboard de Empleado ====================================================
-@login_required
-def employee_dashboard(request):
-    """
-    Dashboard del empleado:
-    - KPIs de tareas (pendientes/completadas)
-    - Listado de MIS TAREAS con toda la info (sin pool)
-    """
-    # Query base: tareas asignadas al usuario actual
-    my_qs = (
-        Task.objects
-        .select_related("assigned_by", "assigned_to__user", "category")
-        .filter(assigned_to__user=request.user)
-    )
-
-    # KPIs
-    pending_count = my_qs.filter(status__in=["pending", "in_progress", "on_hold"]).count()
-    completed_count = my_qs.filter(status="completed").count()
-
-    # Orden sugerido: primero no completadas por vencimiento, luego completadas recientes
-    my_tasks = list(
-        my_qs.annotate().order_by("status", "due_date", "-updated_at")[:100]
-    )
-
-    # Normaliza progress_percentage -> progress_pct (0..100)
-    def to_pct(v):
-        try:
-            v = float(v)
-        except (TypeError, ValueError):
-            return 0
-        if v <= 1:         # viene como fracción (ej. 0.42)
-            v = v * 100.0
-        # si ya viene en 0..100, se queda
-        return max(0, min(100, round(v)))
-
-    for t in my_tasks:
-        # Si tu modelo usa None para "sin progreso", respétalo.
-        raw = getattr(t, "progress_percentage", None)
-        t.progress_pct = None if raw is None else to_pct(raw)
-
-    context = {
-        "pending_count": pending_count,
-        "completed_count": completed_count,
-        "my_tasks": my_tasks,
-        "today": timezone.now(),
-    }
-    return render(request, "employees/dashboard.html", context)
 
 
 # === DRF ViewSets básicos =====================================================

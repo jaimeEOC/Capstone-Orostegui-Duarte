@@ -46,8 +46,6 @@
   .cta-btn{display:inline-flex;align-items:center;gap:.5rem;background:#2f855a;color:#fff;border:none;border-radius:10px;font-weight:700;padding:.65rem 1rem;text-decoration:none}
   .cta-btn:hover{filter:brightness(0.98)}
 
-  /* Placeholder del gráfico */
-  .performance-chart .chart-placeholder{display:flex;align-items:center;justify-content:center;height:220px;background:#f7fafc;border:2px dashed #e2e8f0;border-radius:12px;color:#718096;gap:.6rem}
 
   @media (max-width:768px){
     .content-grid{grid-template-columns:1fr;}
@@ -148,7 +146,6 @@
   <div class="main-content">
     <h2 class="section-title">Mi Rendimiento (Últimos 7 días)</h2>
     <div class="performance-chart">
-      <div class="chart-placeholder"><i class="fas fa-chart-line"></i> Gráfico de rendimiento próximamente</div>
     </div>
   </div>
 
@@ -161,26 +158,13 @@
       <span>Mis Tareas</span>
     </a>
 
-    <a href="#" class="action-button" onclick="alert('Módulo de Rendimiento próximamente disponible')">
-      <i class="fas fa-chart-bar action-icon"></i>
-      <span>Mi Rendimiento</span>
-    </a>
-
     <a href="{% url 'users:profile' %}" class="action-button">
       <i class="fas fa-user action-icon"></i>
       <span>Mi Perfil</span>
-    </a>
-
-    <a href="#" class="action-button" onclick="logWork()">
-      <i class="fas fa-clock action-icon"></i>
-      <span>Registrar Trabajo</span>
     </a>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-function logWork(){alert('Función de registro de trabajo próximamente disponible.');}
-</script>
 {% endblock %}

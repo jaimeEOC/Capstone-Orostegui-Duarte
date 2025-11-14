@@ -29,7 +29,12 @@ class LoginView(View):
         """Muestra el formulario de login"""
         if request.user.is_authenticated:
             return redirect(self.get_redirect_url(request.user))
-        return render(request, self.template_name)
+        
+        # Contexto para mostrar advertencia sobre sesiones compartidas
+        context = {
+            'show_session_warning': True,
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request):
         """Procesa el formulario de login"""
@@ -38,7 +43,8 @@ class LoginView(View):
 
         if not username or not password:
             messages.error(request, 'Por favor, completa todos los campos.')
-            return render(request, self.template_name)
+            context = {'show_session_warning': True}
+            return render(request, self.template_name, context)
 
         # Autenticar usuario
         user = authenticate(request, username=username, password=password)
@@ -60,7 +66,8 @@ class LoginView(View):
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
 
-        return render(request, self.template_name)
+        context = {'show_session_warning': True}
+        return render(request, self.template_name, context)
 
     def get_redirect_url(self, user):
         """Retorna la URL de redirección según el rol del usuario"""

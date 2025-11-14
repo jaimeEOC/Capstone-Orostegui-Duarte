@@ -19,6 +19,14 @@
           <div class="alert alert-warning">Debes iniciar sesión para acceder a esta página.</div>
         {% endif %}
 
+        {% if show_session_warning %}
+          <div class="alert alert-info">
+            <i class="fa fa-info-circle me-2"></i>
+            <strong>Nota importante:</strong> Las sesiones son compartidas entre todas las pestañas del mismo navegador. 
+            Si necesitas trabajar con múltiples usuarios simultáneamente, usa diferentes navegadores o perfiles de navegador.
+          </div>
+        {% endif %}
+
         <form method="post" novalidate>
           {% csrf_token %}
           <div class="mb-3">

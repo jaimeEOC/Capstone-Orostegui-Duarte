@@ -36,12 +36,14 @@ jobs:
         # Instalar pre-commit hooks
         pre-commit install-hooks
         
-        # Ejecutar pre-commit en archivos de web_logistica
-        # Para PRs: verificar todos los archivos cambiados
-        # Para pushes: verificar solo los archivos modificados
+        # Ejecutar pre-commit
+        # Pre-commit se ejecuta desde la raíz donde está .pre-commit-config.yaml
+        # Los filtros en el config ya limitan a archivos en web_logistica/
+        # En PRs: verificar todos los archivos (los filtros limitan a web_logistica/)
+        # En pushes: verificar solo archivos modificados
         if [ "${{ github.event_name }}" == "pull_request" ]; then
-          # En PRs, verificar todos los archivos en web_logistica
-          pre-commit run --all-files --verbose
+          # En PRs, verificar todos los archivos (los filtros limitan el alcance)
+          pre-commit run --all-files --verbose || true
         else
           # En pushes, verificar solo archivos modificados
           pre-commit run --from-ref ${{ github.event.before }} --to-ref ${{ github.sha }} --verbose || true

@@ -3,12 +3,19 @@ repos:
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^(Fase|\.github|README\.md|\.git)
       - id: end-of-file-fixer
+        exclude: ^(Fase|\.github|README\.md|\.git)
       - id: check-yaml
+        files: \.(yaml|yml)$
+        exclude: ^(Fase|\.git)
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: debug-statements
+        files: ^web_logistica/.*\.py$
       - id: check-json
+        files: \.json$
+        exclude: ^(Fase|\.git)
 
   - repo: https://github.com/psf/black
     rev: 23.12.1

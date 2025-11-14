@@ -31,25 +31,26 @@ jobs:
           ${{ runner.os }}-pip-
 
     - name: Install Dependencies
+      working-directory: web_logistica
       run: |
         python -m pip install --upgrade pip
-        cd web_logistica
         pip install -r requirements-windows-simple.txt
 
     - name: Create logs directory
-      run: |
-        cd web_logistica
-        mkdir -p logs
+      working-directory: web_logistica
+      run: mkdir -p logs
 
     - name: Run Database Migrations
-      run: |
-        cd web_logistica
-        python manage.py migrate
+      working-directory: web_logistica
+      env:
+        DJANGO_SETTINGS_MODULE: logistica_hr.settings.development
+      run: python manage.py migrate
 
     - name: Run Tests
-      run: |
-        cd web_logistica
-        python manage.py test --verbosity=2
+      working-directory: web_logistica
+      env:
+        DJANGO_SETTINGS_MODULE: logistica_hr.settings.development
+      run: python manage.py test --verbosity=2
 
   lint:
     runs-on: ubuntu-latest
@@ -67,9 +68,9 @@ jobs:
         pip install flake8 black isort
 
     - name: Run basic linting
+      working-directory: web_logistica
       run: |
         echo "Running basic code quality checks..."
-        cd web_logistica
         # Solo verificar errores críticos
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --max-line-length=120 --exclude=migrations,venv,__pycache__ || echo "Flake8 found issues but continuing..."
         echo "Linting completed"

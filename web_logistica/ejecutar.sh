@@ -71,8 +71,8 @@ show_success "Dependencias instaladas"
 # Configurar base de datos
 echo ""
 echo -e "${YELLOW}[6/8] Configurando base de datos...${NC}"
-python manage.py makemigrations --settings=logistica_hr.settings_sqlite --noinput
-python manage.py migrate --settings=logistica_hr.settings_sqlite --noinput
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
 show_success "Base de datos configurada"
 
 # Crear superusuario
@@ -101,4 +101,4 @@ echo -e "${RED}Presiona Ctrl+C para detener el servidor${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 
-python manage.py runserver --settings=logistica_hr.settings_sqlite
+python manage.py runserver

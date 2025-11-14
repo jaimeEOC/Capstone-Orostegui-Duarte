@@ -93,22 +93,22 @@ web_logistica/
 
 ### Verificar instalación
 ```bash
-python manage.py check --settings=logistica_hr.settings_sqlite
+python manage.py check
 ```
 
 ### Crear migraciones
 ```bash
-python manage.py makemigrations --settings=logistica_hr.settings_sqlite
+python manage.py makemigrations
 ```
 
 ### Aplicar migraciones
 ```bash
-python manage.py migrate --settings=logistica_hr.settings_sqlite
+python manage.py migrate
 ```
 
 ### Ejecutar tests
 ```bash
-python manage.py test --settings=logistica_hr.settings_sqlite
+python manage.py test
 ```
 
 ## 📞 Soporte

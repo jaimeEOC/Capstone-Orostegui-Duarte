@@ -277,6 +277,14 @@
         {% endfor %}
     {% endif %}
 
+    {% if show_session_warning %}
+        <div class="alert alert-info" style="background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; margin-bottom: 1.5rem; border-radius: 4px;">
+            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+            <strong>Nota importante:</strong> Las sesiones son compartidas entre todas las pestañas del mismo navegador. 
+            Si necesitas trabajar con múltiples usuarios simultáneamente, usa diferentes navegadores o perfiles de navegador.
+        </div>
+    {% endif %}
+
     <form method="post" id="loginForm">
         {% csrf_token %}
 

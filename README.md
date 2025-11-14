@@ -50,15 +50,18 @@ Desarrollar una aplicación web de gestión y evaluación de personal para el á
 
 ### Estructura del Proyecto
 ```
-logistica_hr/
+web_logistica/
 ├── logistica_hr/          # Configuración principal del proyecto
-├── logistica_hr/core/     # Funcionalidades base y modelos comunes
-├── logistica_hr/users/    # Gestión de usuarios y autenticación
-├── logistica_hr/employees/ # Gestión de empleados y departamentos
-├── logistica_hr/tasks/    # Gestión de tareas y asignaciones
-├── logistica_hr/performance/ # Métricas y evaluación de rendimiento
-├── logistica_hr/reports/  # Generación y programación de reportes
-└── static/                # Archivos estáticos
+│   ├── settings/          # Configuración modular (base, development, production)
+│   ├── core/              # Funcionalidades base y modelos comunes
+│   ├── users/             # Gestión de usuarios y autenticación
+│   ├── employees/         # Gestión de empleados y departamentos
+│   ├── tasks/             # Gestión de tareas y asignaciones
+│   ├── performance/       # Métricas y evaluación de rendimiento
+│   └── reports/           # Generación y programación de reportes
+├── templates/             # Plantillas HTML
+├── static/               # Archivos estáticos
+└── manage.py             # Script de gestión de Django
 ```
 
 ## 🚀 Características Principales
@@ -129,14 +132,14 @@ venv\Scripts\activate  # Windows
 pip install -r requirements-windows-simple.txt
 
 # 4. Configurar base de datos
-python manage.py makemigrations --settings=logistica_hr.settings_sqlite
-python manage.py migrate --settings=logistica_hr.settings_sqlite
+python manage.py makemigrations
+python manage.py migrate
 
 # 5. Crear superusuario
 python create_superuser.py
 
 # 6. Ejecutar servidor
-python manage.py runserver --settings=logistica_hr.settings_sqlite
+python manage.py runserver
 ```
 
 ### 🌐 Acceder al Sistema
@@ -206,12 +209,15 @@ CELERY_RESULT_BACKEND=redis://localhost:6379/0
 
 #### Opción A: SQLite (Simple)
 ```bash
-python manage.py makemigrations --settings=logistica_hr.settings_sqlite
-python manage.py migrate --settings=logistica_hr.settings_sqlite
+cd web_logistica
+python manage.py makemigrations
+python manage.py migrate
 ```
 
 #### Opción B: PostgreSQL (Completo)
 ```bash
+cd web_logistica
+
 # Crear base de datos PostgreSQL
 createdb logistica_hr
 
@@ -222,6 +228,8 @@ python manage.py migrate
 
 ### 6. Crear Superusuario
 ```bash
+cd web_logistica
+
 # Opción A: Script automático
 python create_superuser.py
 
@@ -233,11 +241,14 @@ python manage.py createsuperuser
 
 #### Desarrollo Simple
 ```bash
-python manage.py runserver --settings=logistica_hr.settings_sqlite
+cd web_logistica
+python manage.py runserver
 ```
 
 #### Producción Completa
 ```bash
+cd web_logistica
+
 # Terminal 1: Servidor Django
 python manage.py runserver
 
@@ -252,7 +263,7 @@ celery -A logistica_hr beat -l info
 
 ## 📖 Guía Detallada
 
-Para una guía completa con solución de problemas, consulta: **[GUIA_EJECUCION.md](GUIA_EJECUCION.md)**
+Para una guía completa con solución de problemas, consulta: **[web_logistica/GUIA_EJECUCION.md](web_logistica/GUIA_EJECUCION.md)**
 
 ## 📱 Uso del Sistema
 

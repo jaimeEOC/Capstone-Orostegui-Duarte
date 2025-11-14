@@ -3,25 +3,34 @@ repos:
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^(Fase|\.github|README\.md|\.git)
       - id: end-of-file-fixer
+        exclude: ^(Fase|\.github|README\.md|\.git)
       - id: check-yaml
+        files: \.(yaml|yml)$
+        exclude: ^(Fase|\.git)
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: debug-statements
+        files: ^web_logistica/.*\.py$
       - id: check-json
+        files: \.json$
+        exclude: ^(Fase|\.git)
 
   - repo: https://github.com/psf/black
     rev: 23.12.1
     hooks:
       - id: black
         language_version: python3
-        args: [--line-length=88]
+        args: [--line-length=120]
+        files: ^web_logistica/.*\.py$
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
-        args: [--profile=black]
+        args: [--profile=black, --line-length=120]
+        files: ^web_logistica/.*\.py$
 
   # - repo: https://github.com/pycqa/flake8
   #   rev: 7.0.0

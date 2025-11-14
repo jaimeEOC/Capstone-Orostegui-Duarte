@@ -72,8 +72,8 @@ echo ✓ Dependencias instaladas
 :: Configurar base de datos
 echo.
 echo [6/8] Configurando base de datos...
-python manage.py makemigrations --settings=logistica_hr.settings_sqlite --noinput
-python manage.py migrate --settings=logistica_hr.settings_sqlite --noinput
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
 if %errorlevel% neq 0 (
     echo ERROR: No se pudo configurar la base de datos
     pause
@@ -112,4 +112,4 @@ echo Presiona Ctrl+C para detener el servidor
 echo ========================================
 echo.
 
-python manage.py runserver --settings=logistica_hr.settings_sqlite
+python manage.py runserver

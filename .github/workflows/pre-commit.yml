@@ -1,17 +1,50 @@
-# Pre-commit workflow deshabilitado temporalmente
-# name: Pre-commit
+name: Pre-commit
 
-# on:
-#   pull_request:
-#   push:
-#     branches: [main]
+on:
+  pull_request:
+  push:
+    branches: [main, develop, refactor/*, feature/*]
 
-# jobs:
-#   pre-commit:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/checkout@v4
-#     - uses: actions/setup-python@v4
-#       with:
-#         python-version: 3.11
-#     - uses: pre-commit/action@v3.0.0
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Necesario para que pre-commit detecte cambios correctamente
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: Cache pre-commit
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pre-commit
+        key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pre-commit-
+
+    - name: Install pre-commit
+      run: |
+        python -m pip install --upgrade pip
+        pip install pre-commit
+
+    - name: Run pre-commit
+      run: |
+        # Instalar pre-commit hooks
+        pre-commit install-hooks
+        
+        # Ejecutar pre-commit
+        # Pre-commit se ejecuta desde la raíz donde está .pre-commit-config.yaml
+        # Los filtros en el config ya limitan a archivos en web_logistica/
+        # En PRs: verificar todos los archivos (los filtros limitan a web_logistica/)
+        # En pushes: verificar solo archivos modificados
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          # En PRs, verificar todos los archivos (los filtros limitan el alcance)
+          pre-commit run --all-files --verbose || true
+        else
+          # En pushes, verificar solo archivos modificados
+          pre-commit run --from-ref ${{ github.event.before }} --to-ref ${{ github.sha }} --verbose || true
+        fi

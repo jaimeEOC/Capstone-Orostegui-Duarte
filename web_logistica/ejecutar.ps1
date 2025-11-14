@@ -93,8 +93,8 @@ if (-not $SkipDependencies) {
 if (-not $SkipMigrations) {
     Write-Host ""
     Write-Host "[6/8] Configurando base de datos..." -ForegroundColor Yellow
-    python manage.py makemigrations --settings=logistica_hr.settings_sqlite --noinput
-    python manage.py migrate --settings=logistica_hr.settings_sqlite --noinput
+    python manage.py makemigrations --noinput
+    python manage.py migrate --noinput
     if ($LASTEXITCODE -ne 0) {
         Show-Error "No se pudo configurar la base de datos"
     }
@@ -138,4 +138,4 @@ Write-Host "Presiona Ctrl+C para detener el servidor" -ForegroundColor Red
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 
-python manage.py runserver --settings=logistica_hr.settings_sqlite
+python manage.py runserver

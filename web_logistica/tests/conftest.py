@@ -10,8 +10,29 @@ from django.test import RequestFactory
 from django.contrib.auth import get_user_model
 
 # Configurar Django para testing
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'logistica_hr.settings_sqlite')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'logistica_hr.settings.development')
 django.setup()
+
+# Monkey patch para solucionar problema de compatibilidad Python 3.14 + Django 4.2.7
+# El problema está en django/template/context.py cuando intenta copiar el contexto
+import sys
+if sys.version_info >= (3, 14):
+    from django.template import context
+    
+    def _patched_copy(self):
+        """Versión parcheada de __copy__ que funciona con Python 3.14"""
+        # Para RequestContext, necesitamos pasar el request
+        if hasattr(self, 'request'):
+            duplicate = self.__class__(self.request)
+        else:
+            duplicate = self.__class__()
+        duplicate.dicts = self.dicts[:]
+        return duplicate
+    
+    # Aplicar el patch a ambas clases
+    context.Context.__copy__ = _patched_copy
+    if hasattr(context, 'RequestContext'):
+        context.RequestContext.__copy__ = _patched_copy
 
 User = get_user_model()
 

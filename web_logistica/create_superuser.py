@@ -3,7 +3,7 @@ import os
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'logistica_hr.settings_sqlite')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'logistica_hr.settings.development')
 django.setup()
 
 from django.contrib.auth import get_user_model

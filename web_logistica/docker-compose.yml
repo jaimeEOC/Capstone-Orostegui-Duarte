@@ -40,7 +40,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DJANGO_SETTINGS_MODULE=logistica_hr.settings
+      - DJANGO_SETTINGS_MODULE=logistica_hr.settings.production
       - DJANGO_DEBUG=True
       - DB_HOST=db
       - DB_NAME=logistica_hr
@@ -67,7 +67,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - DJANGO_SETTINGS_MODULE=logistica_hr.settings
+      - DJANGO_SETTINGS_MODULE=logistica_hr.settings.production
       - DB_HOST=db
       - DB_NAME=logistica_hr
       - DB_USER=postgres
@@ -88,7 +88,7 @@ services:
     volumes:
       - .:/app
     environment:
-      - DJANGO_SETTINGS_MODULE=logistica_hr.settings
+      - DJANGO_SETTINGS_MODULE=logistica_hr.settings.production
       - DB_HOST=db
       - DB_NAME=logistica_hr
       - DB_USER=postgres

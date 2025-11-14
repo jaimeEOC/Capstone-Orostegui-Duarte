@@ -32,8 +32,9 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [4/6] Configurando base de datos...
-python manage.py makemigrations --settings=logistica_hr.settings_sqlite
-python manage.py migrate --settings=logistica_hr.settings_sqlite
+cd web_logistica
+python manage.py makemigrations
+python manage.py migrate
 if %errorlevel% neq 0 (
     echo ERROR: No se pudo configurar la base de datos
     pause
@@ -68,4 +69,5 @@ echo Presiona Ctrl+C para detener el servidor
 echo ========================================
 echo.
 
-python manage.py runserver --settings=logistica_hr.settings_sqlite
+cd web_logistica
+python manage.py runserver

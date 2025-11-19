@@ -5,19 +5,34 @@
 
 {% block extra_css %}
 <style>
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+    
     .dashboard-container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 2rem 1rem;
     }
-    
+
+    /* ⭐ ADMIN – MORADO CLARO PREMIUM ⭐ */
     .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f7ccf 0%, #7b9dff 100%);
         color: white;
         padding: 2rem;
         border-radius: 15px;
         margin-bottom: 2rem;
         text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
     }
     
     .dashboard-title {
@@ -82,12 +97,6 @@
         font-weight: 600;
     }
     
-    .content-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-    }
-    
     .main-content {
         background: white;
         border-radius: 15px;
@@ -128,15 +137,6 @@
     .department-name {
         font-weight: 600;
         color: #2d3748;
-    }
-    
-    .department-count {
-        background: #667eea;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
     }
     
     .activities-list {
@@ -189,15 +189,9 @@
         font-size: 0.8rem;
     }
     
-    .quick-actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-    
+    /* ⭐ QUICK ACTIONS ADMIN – MORADO CLARO ⭐ */
     .action-button {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(135deg, #4f7ccf 0%, #7b9dff 100%);
         color: white;
         padding: 1rem;
         border-radius: 10px;
@@ -209,13 +203,13 @@
         flex-direction: column;
         align-items: center;
         gap: 0.5rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.18);
     }
     
     .action-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        color: white;
-        text-decoration: none;
+        background: linear-gradient(135deg, #3d68c0 0%, #6a8cff 100%);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
     
     .action-icon {
@@ -288,8 +282,10 @@
         color: #2d3748;
     }
     
+    /* ⭐ BADGES ADMIN – MORADO CLARO ⭐ */
+    .department-count,
     .supervisor-team {
-        background: #667eea;
+        background: linear-gradient(135deg, #4f7ccf 0%, #7b9dff 100%);
         color: white;
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
@@ -329,11 +325,12 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
+    /* ⭐ AVATAR ADMIN – MORADO CLARO ⭐ */
     .employee-avatar-small {
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f7ccf 0%, #7b9dff 100%);
         color: white;
         display: flex;
         align-items: center;
@@ -377,6 +374,8 @@
         }
     }
 </style>
+
+
 {% endblock %}
 
 {% block content %}
@@ -400,7 +399,7 @@
                 <i class="fas fa-user-tie"></i>
             </div>
             <div class="stat-number">{{ stats.total_employees }}</div>
-            <div class="stat-label">Empleados</div>
+            <div class="stat-label">Usuarios</div>
         </div>
         
         <div class="stat-card">
@@ -424,7 +423,7 @@
                 <i class="fas fa-user-check"></i>
             </div>
             <div class="stat-number">{{ stats.active_employees_today }}</div>
-            <div class="stat-label">Empleados Activos</div>
+            <div class="stat-label">Usuarios Activos</div>
         </div>
         
         <div class="stat-card">
@@ -520,7 +519,7 @@
                     {% for item in supervisors_with_teams %}
                     <li class="supervisor-item">
                         <div class="supervisor-name">{{ item.supervisor.full_name }}</div>
-                        <div class="supervisor-team">{{ item.team_count }} empleados</div>
+                        <div class="supervisor-team">{{ item.team_count }} usuarios</div>
                     </li>
                     {% endfor %}
                 </ul>
@@ -533,7 +532,7 @@
     
     <div class="secondary-content">
         <div class="content-section">
-            <h2 class="section-title">Empleados Recientes</h2>
+            <h2 class="section-title">Usuarios Recientes</h2>
             {% if new_employees %}
             <div class="employees-grid">
                 {% for emp in new_employees %}
@@ -558,7 +557,7 @@
                 {% endfor %}
             </div>
             {% else %}
-            <p style="color: #718096; text-align: center; padding: 2rem;">No hay empleados recientes</p>
+            <p style="color: #718096; text-align: center; padding: 2rem;">No hay usuarios recientes</p>
             {% endif %}
         </div>
     </div>
@@ -571,18 +570,9 @@
         
         <a href="{% url 'admin_employees_list' %}" class="action-button">
             <i class="fas fa-users action-icon"></i>
-            <span>Gestionar Empleados</span>
+            <span>Gestionar Usuarios</span>
         </a>
         
-        <a href="#" class="action-button" onclick="alert('Módulo de Reportes próximamente disponible')">
-            <i class="fas fa-chart-bar action-icon"></i>
-            <span>Ver Reportes</span>
-        </a>
-        
-        <a href="#" class="action-button" onclick="alert('Módulo de Rendimiento próximamente disponible')">
-            <i class="fas fa-tachometer-alt action-icon"></i>
-            <span>Rendimiento</span>
-        </a>
     </div>
 </div>
 {% endblock %}

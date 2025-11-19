@@ -5,6 +5,7 @@ Formularios para la aplicación users
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -13,6 +14,7 @@ class RegistrationForm(forms.ModelForm):
     """
     Formulario de registro de usuarios
     """
+    username = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     password1 = forms.CharField(
         label="Contraseña",
@@ -38,15 +40,8 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["username", "email", "first_name", "last_name", "role", "phone"]
+        fields = ["email", "first_name", "last_name", "role", "phone"]
         widgets = {
-            "username": forms.TextInput(
-                attrs={
-                    "class": "form-input",
-                    "placeholder": "Nombre de usuario",
-                    "id": "id_username",
-                }
-            ),
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-input",
@@ -72,23 +67,52 @@ class RegistrationForm(forms.ModelForm):
             "phone": forms.TextInput(
                 attrs={
                     "class": "form-input",
-                    "placeholder": "Teléfono",
+                    "placeholder": "912345678",
                     "id": "id_phone",
+                    "maxlength": "9",
+                    "inputmode": "numeric",
+                    "pattern": "9\\d{8}",  # Regex HTML
+                    "title": "Debe comenzar con 9 y tener 9 dígitos"
                 }
             ),
         }
 
-    def clean_username(self):
-        """Validar unicidad de username - SIN validación de BD por ahora"""
-        username = (self.cleaned_data.get("username") or "").strip()
-        # Temporalmente sin validación de BD para evitar errores
-        return username
-
     def clean_email(self):
-        """Validar unicidad de email - SIN validación de BD por ahora"""
-        email = (self.cleaned_data.get("email") or "").strip()
-        # Temporalmente sin validación de BD para evitar errores
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+
+        if not email:
+            raise ValidationError("El correo es obligatorio.")
+
+        # Buscar en la BD si ya existe ese correo
+        qs = User.objects.filter(email__iexact=email)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise ValidationError(
+                "Ya existe una cuenta registrada con este correo."
+            )
+
         return email
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get("phone")
+
+        # Si está vacío → es válido (tests lo requieren)
+        if not phone:
+            return phone
+
+        # Si tiene contenido → validar formato
+        if not phone.startswith('9'):
+            raise forms.ValidationError("El teléfono debe comenzar con 9.")
+
+        if len(phone) != 9:
+            raise forms.ValidationError("El teléfono debe tener 9 dígitos.")
+
+        return phone
+
+
+
 
     def clean(self):
         """Validación general del formulario"""
@@ -109,9 +133,24 @@ class RegistrationForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
-        """Guardar usuario con contraseña encriptada"""
         user = super().save(commit=False)
+
+        first = self.cleaned_data["first_name"].strip().lower()
+        last = self.cleaned_data["last_name"].strip().lower()
+
+        base_username = f"{first}.{last}".replace(" ", "")
+
+        username = base_username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            counter += 1
+            username = f"{base_username}{counter}"
+
+        user.username = username
         user.set_password(self.cleaned_data["password1"])
+
         if commit:
             user.save()
+
         return user
+

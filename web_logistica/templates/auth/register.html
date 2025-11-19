@@ -11,6 +11,41 @@
 
 {% block extra_head %}
 <style>
+    .phone-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    }
+
+    .input-prefix {
+        position: absolute;
+        left: 1rem;
+        font-size: 0.95rem;
+        color: #4a5568;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding-right: 0.8rem;
+        min-width: 58px;  
+    }
+
+    .prefix-divider::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;           
+    height: 70%;          
+    background-color: #94a3b8; 
+    border-radius: 2px;
+    }
+
+    #id_phone {
+        padding-left: 5rem !important; 
+    }
+
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -25,6 +60,16 @@
         background: white;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .register-container {
+        background: #eef2ff; 
+        border: 1px solid #c7d2fe;
+        border-radius: 14px;
+        box-shadow: 0 10px 35px rgba(55, 65, 81, 0.25); 
         padding: 2.5rem;
         width: 100%;
         position: relative;
@@ -214,6 +259,8 @@
 {% endblock %}
 
 {% block content %}
+<pre>{{ form.errors }}</pre>
+
 <div class="register-container">
     <div class="logo-section">
         <div class="logo-icon">
@@ -248,22 +295,6 @@
     <form method="post" id="registerForm">
         {% csrf_token %}
 
-        <div class="form-group">
-            <label for="id_username" class="form-label">Nombre de Usuario</label>
-            {{ form.username }}
-            {% for error in form.username.errors %}
-                <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <div class="form-group">
-            <label for="id_email" class="form-label">Correo</label>
-            {{ form.email }}
-            {% for error in form.email.errors %}
-                <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
-        </div>
-
         <div class="form-row">
             <div class="form-group">
                 <label for="id_first_name" class="form-label">Nombre</label>
@@ -283,12 +314,26 @@
         </div>
 
         <div class="form-group">
+            <label for="id_email" class="form-label">Correo</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
             <label for="id_phone" class="form-label">Teléfono</label>
-            {{ form.phone }}
+
+            <div class="input-wrapper phone-wrapper">
+                <span class="input-prefix prefix-divider">🇨🇱 +56</span>
+                {{ form.phone }}
+            </div>
+
             {% for error in form.phone.errors %}
                 <div class="text-danger small">{{ error }}</div>
             {% endfor %}
         </div>
+
 
         <div class="form-group">
             <label for="id_role" class="form-label">Rol</label>
@@ -340,18 +385,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const buttonText = document.getElementById('buttonText');
 
     form.addEventListener('submit', function(e) {
-        // Mostrar loading
         button.disabled = true;
         buttonText.textContent = 'Creando cuenta...';
-
-        // Simular delay mínimo para UX
         setTimeout(() => {
-            // El formulario se enviará normalmente
         }, 500);
     });
 
-    // Auto-focus en el primer campo
-    document.getElementById('id_username').focus();
+    // Ahora hacemos foco en el correo o el nombre
+    const firstField = document.getElementById('id_email') || document.getElementById('id_first_name');
+    if (firstField) {
+        firstField.focus();
+    }
 });
 </script>
 {% endblock %}

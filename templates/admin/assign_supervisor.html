@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Asignar Supervisor - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .back-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .employee-info {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #4a5568;
+    }
+    
+    .info-value {
+        color: #2d3748;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #2d3748;
+    }
+    
+    .btn-secondary:hover {
+        background: #cbd5e0;
+    }
+    
+    .btn-danger {
+        background: #fed7d7;
+        color: #c53030;
+    }
+    
+    .btn-danger:hover {
+        background: #fc8181;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Asignar Supervisor</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Asignar o cambiar supervisor de empleado</p>
+        </div>
+        <a href="{% url 'admin_employees_list' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+    
+    <div class="form-card">
+        <div class="employee-info">
+            <h3 style="margin-bottom: 1rem; color: #2d3748;">Información del Empleado</h3>
+            <div class="info-row">
+                <span class="info-label">Nombre:</span>
+                <span class="info-value">{{ employee.user.full_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">ID Empleado:</span>
+                <span class="info-value">{{ employee.employee_id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Posición:</span>
+                <span class="info-value">
+                    {% if employee.position %}
+                        {{ employee.position.name }}
+                    {% else %}
+                        Sin posición asignada
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Supervisor Actual:</span>
+                <span class="info-value">
+                    {% if employee.supervisor %}
+                        {{ employee.supervisor.full_name }}
+                    {% else %}
+                        <span style="color: #c53030;">Sin supervisor asignado</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="supervisor_id">Seleccionar Supervisor</label>
+                <select name="supervisor_id" id="supervisor_id" class="form-select">
+                    <option value="">-- Sin supervisor (Remover asignación) --</option>
+                    {% for supervisor in supervisors %}
+                    <option value="{{ supervisor.id }}" {% if employee.supervisor and employee.supervisor.id == supervisor.id %}selected{% endif %}>
+                        {{ supervisor.full_name }} ({{ supervisor.email }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <small style="color: #718096; margin-top: 0.5rem; display: block;">
+                    Selecciona un supervisor o deja en blanco para remover la asignación actual
+                </small>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+                <a href="{% url 'admin_employees_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

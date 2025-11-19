@@ -1,0 +1,510 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Rendimiento - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .performance-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .breadcrumbs {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .breadcrumbs a {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+    }
+    
+    .breadcrumbs a:hover {
+        text-decoration: underline;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #1e4a72, #3b82f6);
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+        color: white;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        background: white;
+    }
+    
+    .stat-icon.packages { color: #3b82f6; }
+    .stat-icon.trucks { color: #3b82f6; }
+    .stat-icon.quality { color: #3b82f6; }
+    .stat-icon.incidents { color: #3b82f6; }
+    .stat-icon.hours { color: #3b82f6; }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-comparison {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
+    
+    .stat-comparison.up {
+        color: #34d399;
+    }
+    
+    .stat-comparison.down {
+        color: #fca5a5;
+    }
+    
+    .content-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e4a72;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .performance-chart {
+        margin: 2rem 0;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    .history-table thead {
+        background: #f1f5f9;
+    }
+    
+    .history-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #1e4a72;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .history-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .history-table tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: #718096;
+    }
+    
+    .no-data i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="performance-container">
+    <!-- Encabezado -->
+    <div class="page-header">
+        <h1><i class="fas fa-chart-line me-2"></i>Mi Rendimiento</h1>
+        <div class="breadcrumbs">
+            <a href="{% url 'home' %}"><i class="fas fa-home"></i> Dashboard</a>
+            <span class="mx-2">›</span>
+            <span>Mi Rendimiento</span>
+        </div>
+    </div>
+    
+    <!-- Estadísticas de la Semana -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon packages">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.total_packages|default:"0" }}</div>
+            <div class="stat-label">Paquetes Procesados</div>
+            {% if comparisons.packages.last > 0 %}
+                {% if comparisons.packages.difference > 0 %}
+                    <div class="stat-comparison up">
+                        <i class="fas fa-arrow-up"></i> +{{ comparisons.packages.difference|floatformat:0 }} vs semana pasada
+                    </div>
+                {% elif comparisons.packages.difference < 0 %}
+                    <div class="stat-comparison down">
+                        <i class="fas fa-arrow-down"></i> {{ comparisons.packages.difference|floatformat:0 }} vs semana pasada
+                    </div>
+                {% else %}
+                    <div class="stat-comparison">Sin cambios</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon trucks">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.total_trucks|default:"0" }}</div>
+            <div class="stat-label">Camiones Totales</div>
+            {% if comparisons.trucks.last > 0 %}
+                {% if comparisons.trucks.difference > 0 %}
+                    <div class="stat-comparison up">
+                        <i class="fas fa-arrow-up"></i> +{{ comparisons.trucks.difference|floatformat:0 }} vs semana pasada
+                    </div>
+                {% elif comparisons.trucks.difference < 0 %}
+                    <div class="stat-comparison down">
+                        <i class="fas fa-arrow-down"></i> {{ comparisons.trucks.difference|floatformat:0 }} vs semana pasada
+                    </div>
+                {% else %}
+                    <div class="stat-comparison">Sin cambios</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon quality">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.avg_quality|floatformat:2|default:"0.00" }}</div>
+            <div class="stat-label">Calidad Promedio</div>
+            {% if comparisons.quality.last > 0 %}
+                {% if comparisons.quality.difference > 0 %}
+                    <div class="stat-comparison up">
+                        <i class="fas fa-arrow-up"></i> +{{ comparisons.quality.difference|floatformat:2 }} vs semana pasada
+                    </div>
+                {% elif comparisons.quality.difference < 0 %}
+                    <div class="stat-comparison down">
+                        <i class="fas fa-arrow-down"></i> {{ comparisons.quality.difference|floatformat:2 }} vs semana pasada
+                    </div>
+                {% else %}
+                    <div class="stat-comparison">Sin cambios</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon incidents">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-number">{{ week_performance.total_incidents|default:"0" }}</div>
+            <div class="stat-label">Incidentes</div>
+            {% if comparisons.incidents.last > 0 or comparisons.incidents.current > 0 %}
+                {% if comparisons.incidents.difference < 0 %}
+                    <div class="stat-comparison up">
+                        <i class="fas fa-arrow-down"></i> {{ comparisons.incidents.difference|floatformat:0 }} vs semana pasada
+                    </div>
+                {% elif comparisons.incidents.difference > 0 %}
+                    <div class="stat-comparison down">
+                        <i class="fas fa-arrow-up"></i> +{{ comparisons.incidents.difference|floatformat:0 }} vs semana pasada
+                    </div>
+                {% else %}
+                    <div class="stat-comparison">Sin cambios</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon hours">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number">{{ total_work_hours|default:"0" }}</div>
+            <div class="stat-label">Horas Trabajadas</div>
+            <div class="stat-comparison">Esta semana</div>
+        </div>
+    </div>
+    
+    <!-- Gráfico de Rendimiento -->
+    <div class="content-card">
+        <h2 class="section-title">
+            <i class="fas fa-chart-area me-2"></i>Rendimiento (Últimos 30 días)
+        </h2>
+        <div class="performance-chart">
+            <canvas id="performanceChart" style="max-height: 400px;"></canvas>
+        </div>
+    </div>
+    
+    <!-- Historial Detallado -->
+    <div class="content-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title mb-0">
+                <i class="fas fa-history me-2"></i>Historial Detallado
+            </h2>
+            <a href="{% url 'performance:create_work_log' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Nuevo Registro
+            </a>
+        </div>
+        
+        {% if performance_history %}
+        <div class="table-responsive">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                        <th>Paquetes</th>
+                        <th>Camiones</th>
+                        <th>Calidad</th>
+                        <th>Incidentes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in performance_history %}
+                    <tr>
+                        <td><strong>{{ log.date|date:"d/m/Y" }}</strong></td>
+                        <td>{{ log.start_time|default:"-" }}</td>
+                        <td>{{ log.end_time|default:"-" }}</td>
+                        <td>{{ log.packages_processed|default:"0" }}</td>
+                        <td>
+                            <span class="badge badge-success">{{ log.trucks_received|default:"0" }} recibidos</span>
+                            <span class="badge badge-warning">{{ log.trucks_dispatched|default:"0" }} despachados</span>
+                        </td>
+                        <td>
+                            {% if log.quality_score %}
+                                <span class="badge {% if log.quality_score >= 5 %}badge-success{% elif log.quality_score >= 3 %}badge-warning{% else %}badge-danger{% endif %}">
+                                    {{ log.quality_score|floatformat:2 }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.safety_incidents %}
+                                <span class="badge badge-danger">{{ log.safety_incidents }}</span>
+                            {% else %}
+                                <span class="text-muted">0</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'performance:edit_work_log' log.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-data">
+            <i class="fas fa-inbox"></i>
+            <p>No hay registros de trabajo disponibles.</p>
+            <a href="{% url 'performance:create_work_log' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-1"></i> Crear Primer Registro
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Datos del gráfico
+const chartData = {
+    labels: {{ chart_data.labels|safe }},
+    packages: {{ chart_data.packages|safe }},
+    quality: {{ chart_data.quality|safe }},
+    trucks: {{ chart_data.trucks|safe }}
+};
+
+// Crear gráfico de rendimiento
+const ctx = document.getElementById('performanceChart');
+if (ctx) {
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [
+                {
+                    label: 'Paquetes Procesados',
+                    data: chartData.packages,
+                    borderColor: 'rgb(245, 158, 11)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Calidad Promedio',
+                    data: chartData.quality,
+                    borderColor: 'rgb(236, 72, 153)',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Camiones (Recibidos + Despachados)',
+                    data: chartData.trucks,
+                    borderColor: 'rgb(139, 92, 246)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14
+                    },
+                    bodyFont: {
+                        size: 13
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Día'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Cantidad (Paquetes y Camiones)'
+                    },
+                    beginAtZero: true
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Calidad (0-7)'
+                    },
+                    beginAtZero: true,
+                    max: 7,
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
+

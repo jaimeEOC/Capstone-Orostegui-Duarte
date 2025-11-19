@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reportes del Equipo - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .back-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .reports-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .report-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .report-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-weight: 600;
+    }
+    
+    .stat-value {
+        color: #2d3748;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .performance-table {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th, td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    th {
+        background: #f7fafc;
+        font-weight: 600;
+        color: #2d3748;
+    }
+    
+    tr:hover {
+        background: #f7fafc;
+    }
+    
+    @media (max-width: 768px) {
+        .reports-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Reportes del Equipo</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Análisis de rendimiento del equipo</p>
+        </div>
+        <a href="{% url 'supervisor_dashboard' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+    
+    <div class="reports-grid">
+        <div class="report-card">
+            <h2 class="report-title">Reporte Semanal (7 días)</h2>
+            <div class="stat-item">
+                <span class="stat-label">Total Paquetes:</span>
+                <span class="stat-value">{{ weekly_report.total_packages|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Camiones Recibidos:</span>
+                <span class="stat-value">{{ weekly_report.total_trucks_received|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Camiones Despachados:</span>
+                <span class="stat-value">{{ weekly_report.total_trucks_dispatched|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Calidad Promedio:</span>
+                <span class="stat-value">{{ weekly_report.avg_quality|floatformat:2|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Incidentes:</span>
+                <span class="stat-value">{{ weekly_report.total_incidents|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Días con Registro:</span>
+                <span class="stat-value">{{ weekly_report.total_work_logs|default:"0" }}</span>
+            </div>
+        </div>
+        
+        <div class="report-card">
+            <h2 class="report-title">Reporte Mensual (30 días)</h2>
+            <div class="stat-item">
+                <span class="stat-label">Total Paquetes:</span>
+                <span class="stat-value">{{ monthly_report.total_packages|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Camiones Recibidos:</span>
+                <span class="stat-value">{{ monthly_report.total_trucks_received|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Camiones Despachados:</span>
+                <span class="stat-value">{{ monthly_report.total_trucks_dispatched|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Calidad Promedio:</span>
+                <span class="stat-value">{{ monthly_report.avg_quality|floatformat:2|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Incidentes:</span>
+                <span class="stat-value">{{ monthly_report.total_incidents|default:"0" }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Días con Registro:</span>
+                <span class="stat-value">{{ monthly_report.total_work_logs|default:"0" }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="performance-table">
+        <h2 class="report-title">Rendimiento por Empleado (7 días)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Empleado</th>
+                    <th>Prom. Paquetes/Día</th>
+                    <th>Calidad Promedio</th>
+                    <th>Incidentes</th>
+                    <th>Días Trabajados</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in employee_performance %}
+                <tr>
+                    <td>
+                        <strong>{{ data.employee.user.full_name }}</strong><br>
+                        <small style="color: #718096;">
+                            {% if data.employee.position %}
+                                {{ data.employee.position.name }}
+                            {% else %}
+                                Sin posición
+                            {% endif %}
+                        </small>
+                    </td>
+                    <td>{{ data.performance.avg_packages|floatformat:1|default:"0" }}</td>
+                    <td>{{ data.performance.avg_quality|floatformat:2|default:"0" }}</td>
+                    <td>{{ data.performance.total_incidents|default:"0" }}</td>
+                    <td>{{ data.performance.days_worked|default:"0" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #718096; padding: 2rem;">
+                        No hay datos de rendimiento disponibles
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

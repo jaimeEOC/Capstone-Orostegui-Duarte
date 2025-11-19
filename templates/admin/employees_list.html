@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestionar Empleados - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .back-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .filters-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-input, .filter-select {
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .filter-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    
+    .filter-button:hover {
+        transform: translateY(-2px);
+    }
+    
+    .employees-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .employee-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+    
+    .employee-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .employee-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .employee-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+    }
+    
+    .employee-info {
+        flex: 1;
+    }
+    
+    .employee-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0;
+    }
+    
+    .employee-position {
+        color: #718096;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+    }
+    
+    .employee-supervisor {
+        color: #a0aec0;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    .employee-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    .status-active {
+        background: #c6f6d5;
+        color: #2f855a;
+    }
+    
+    .status-inactive {
+        background: #fed7d7;
+        color: #c53030;
+    }
+    
+    .performance-stats {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .stat-label {
+        color: #718096;
+    }
+    
+    .stat-value {
+        color: #2d3748;
+        font-weight: 600;
+    }
+    
+    .employee-actions {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .action-btn {
+        flex: 1;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-align: center;
+        display: inline-block;
+    }
+    
+    .action-btn.assign {
+        background: #667eea;
+        color: white;
+    }
+    
+    .action-btn.assign:hover {
+        background: #5568d3;
+    }
+    
+    .action-btn.view {
+        background: #e2e8f0;
+        color: #2d3748;
+    }
+    
+    .action-btn.view:hover {
+        background: #cbd5e0;
+    }
+    
+    @media (max-width: 768px) {
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .employees-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Gestión de Empleados</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Administra todos los empleados del sistema</p>
+        </div>
+        <a href="{% url 'admin_dashboard' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="filters-section">
+        <form method="get" action="{% url 'admin_employees_list' %}">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Buscar</label>
+                    <input type="text" name="search" class="filter-input" placeholder="Nombre, email o ID de empleado..." value="{{ search_query }}">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Supervisor</label>
+                    <select name="supervisor" class="filter-select">
+                        <option value="">Todos los supervisores</option>
+                        {% for supervisor in supervisors %}
+                        <option value="{{ supervisor.id }}" {% if supervisor_filter == supervisor.id|stringformat:"s" %}selected{% endif %}>
+                            {{ supervisor.full_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="filter-button">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Mensajes -->
+    {% if messages %}
+    <div style="margin-bottom: 1.5rem;">
+        {% for message in messages %}
+        <div style="padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem; 
+                    {% if message.tags == 'success' %}background: #c6f6d5; color: #2f855a;
+                    {% elif message.tags == 'error' %}background: #fed7d7; color: #c53030;
+                    {% else %}background: #bee3f8; color: #2c5282;{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Lista de Empleados -->
+    {% if employees_data %}
+    <div class="employees-grid">
+        {% for data in employees_data %}
+        <div class="employee-card">
+            <div class="employee-header">
+                <div class="employee-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="employee-info">
+                    <h3 class="employee-name">{{ data.employee.user.full_name }}</h3>
+                    <div class="employee-position">
+                        {% if data.employee.position %}
+                            {{ data.employee.position.name }}
+                        {% else %}
+                            Sin posición asignada
+                        {% endif %}
+                    </div>
+                    <div class="employee-supervisor">
+                        {% if data.employee.supervisor %}
+                            <i class="fas fa-user-tie"></i> Supervisor: {{ data.employee.supervisor.full_name }}
+                        {% else %}
+                            <i class="fas fa-exclamation-circle"></i> Sin supervisor asignado
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="employee-status {% if data.is_active_today %}status-active{% else %}status-inactive{% endif %}">
+                {% if data.is_active_today %}
+                    <i class="fas fa-check-circle"></i> Activo Hoy
+                {% else %}
+                    <i class="fas fa-times-circle"></i> Inactivo Hoy
+                {% endif %}
+            </div>
+            
+            <div class="performance-stats">
+                <div class="stat-row">
+                    <span class="stat-label">ID Empleado:</span>
+                    <span class="stat-value">{{ data.employee.employee_id }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Prom. Paquetes/Día:</span>
+                    <span class="stat-value">{{ data.week_performance.avg_packages|floatformat:1|default:"0" }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Calidad Promedio:</span>
+                    <span class="stat-value">{{ data.week_performance.avg_quality|floatformat:2|default:"0" }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Incidentes (7 días):</span>
+                    <span class="stat-value">{{ data.week_performance.total_incidents|default:"0" }}</span>
+                </div>
+            </div>
+            
+            <div class="employee-actions">
+                <a href="{% url 'admin_assign_supervisor' data.employee.id %}" class="action-btn assign" style="width: 100%;">
+                    <i class="fas fa-user-tie"></i> Asignar Supervisor
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center;">
+        <i class="fas fa-users" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+        <h3 style="color: #4a5568;">No se encontraron empleados</h3>
+        <p style="color: #718096;">Intenta ajustar los filtros de búsqueda.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

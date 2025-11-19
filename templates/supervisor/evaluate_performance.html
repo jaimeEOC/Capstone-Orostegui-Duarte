@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Evaluar Rendimiento - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .back-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+    
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .employee-selector {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .selector-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+    
+    .employee-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .employee-option {
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #2d3748;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    
+    .employee-option:hover {
+        border-color: #3b82f6;
+        background: #f0f7ff;
+        color: #3b82f6;
+    }
+    
+    .employee-option.selected {
+        border-color: #3b82f6;
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .performance-details {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .details-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .performance-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .performance-card {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+    
+    .stat-label {
+        color: #718096;
+    }
+    
+    .stat-value {
+        color: #2d3748;
+        font-weight: 600;
+    }
+    
+    .recent-logs {
+        margin-top: 2rem;
+    }
+    
+    .log-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .log-item:last-child {
+        border-bottom: none;
+    }
+    
+    @media (max-width: 768px) {
+        .performance-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Evaluar Rendimiento</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Análisis detallado del rendimiento de empleados</p>
+        </div>
+        <a href="{% url 'supervisor_dashboard' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+    
+    <div class="employee-selector">
+        <h2 class="selector-title">Seleccionar Empleado</h2>
+        <div class="employee-list">
+            <a href="{% url 'supervisor_evaluate_performance' %}" class="employee-option {% if not selected_employee %}selected{% endif %}">
+                <i class="fas fa-users"></i><br>
+                Todos
+            </a>
+            {% for employee in supervised_employees %}
+            <a href="{% url 'supervisor_evaluate_employee' employee.id %}" class="employee-option {% if selected_employee.id == employee.id %}selected{% endif %}">
+                <i class="fas fa-user"></i><br>
+                {{ employee.user.full_name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    
+    {% if selected_employee and employee_performance %}
+    <div class="performance-details">
+        <h2 class="details-title">Rendimiento de {{ selected_employee.user.full_name }}</h2>
+        
+        <div class="performance-grid">
+            <div class="performance-card">
+                <h3 class="card-title">Semana Actual (7 días)</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Prom. Paquetes/Día:</span>
+                    <span class="stat-value">{{ employee_performance.week.avg_packages|floatformat:1|default:"0" }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Calidad Promedio:</span>
+                    <span class="stat-value">{{ employee_performance.week.avg_quality|floatformat:2|default:"0" }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Incidentes:</span>
+                    <span class="stat-value">{{ employee_performance.week.total_incidents|default:"0" }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Días Trabajados:</span>
+                    <span class="stat-value">{{ employee_performance.week.days_worked|default:"0" }}</span>
+                </div>
+            </div>
+            
+            <div class="performance-card">
+                <h3 class="card-title">Mes Actual (30 días)</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Prom. Paquetes/Día:</span>
+                    <span class="stat-value">{{ employee_performance.month.avg_packages|floatformat:1|default:"0" }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Calidad Promedio:</span>
+                    <span class="stat-value">{{ employee_performance.month.avg_quality|floatformat:2|default:"0" }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Incidentes:</span>
+                    <span class="stat-value">{{ employee_performance.month.total_incidents|default:"0" }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Días Trabajados:</span>
+                    <span class="stat-value">{{ employee_performance.month.days_worked|default:"0" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recent-logs">
+            <h3 class="card-title">Últimos Registros de Trabajo</h3>
+            {% for log in employee_performance.recent_logs %}
+            <div class="log-item">
+                <div>
+                    <strong>{{ log.date|date:"d/m/Y" }}</strong><br>
+                    <small style="color: #718096;">
+                        {{ log.start_time|time:"H:i" }} - {{ log.end_time|time:"H:i" }}
+                    </small>
+                </div>
+                <div style="text-align: right;">
+                    <div><strong>{{ log.packages_processed }}</strong> paquetes</div>
+                    <small style="color: #718096;">Calidad: {{ log.quality_score|floatformat:1|default:"N/A" }}</small>
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: #718096; padding: 2rem;">No hay registros disponibles</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% elif not selected_employee %}
+    <div class="performance-details">
+        <div style="text-align: center; padding: 3rem; color: #718096;">
+            <i class="fas fa-user-check" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3>Selecciona un empleado para ver su rendimiento detallado</h3>
+            <p>Elige un empleado de la lista superior para comenzar la evaluación.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

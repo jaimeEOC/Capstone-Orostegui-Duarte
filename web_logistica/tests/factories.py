@@ -2,12 +2,12 @@
 Factories para crear datos de prueba usando Factory Boy
 """
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import factory
 from django.contrib.auth import get_user_model
 
-from logistica_hr.employees.models import Department, Employee, Position
+from logistica_hr.employees.models import Department, Employee, Position, WorkSchedule
 from logistica_hr.performance.models import (
     DailyWorkLog,
     EmployeePerformance,
@@ -234,3 +234,21 @@ class TaskCommentFactory(factory.django.DjangoModelFactory):
     author = factory.SubFactory(EmployeeUserFactory)
     content = factory.Faker("text", max_nb_chars=500)
     is_internal = False
+
+
+class WorkScheduleFactory(factory.django.DjangoModelFactory):
+    """Factory para crear horarios de trabajo"""
+
+    class Meta:
+        model = WorkSchedule
+
+    employee = factory.SubFactory(EmployeeFactory)
+    day_of_week = factory.Iterator([0, 1, 2, 3, 4, 5, 6])  # Lunes a Domingo
+    start_time = factory.Faker("time_object")
+    end_time = factory.LazyAttribute(
+        lambda obj: (datetime.combine(datetime.today(), obj.start_time) + timedelta(hours=8)).time()
+        if obj.start_time
+        else None
+    )
+    break_start = None
+    break_end = None

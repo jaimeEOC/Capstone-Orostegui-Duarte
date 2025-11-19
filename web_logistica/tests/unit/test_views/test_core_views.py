@@ -12,6 +12,7 @@ from django.utils import timezone
 from logistica_hr.tasks.models import Task
 from logistica_hr.employees.models import Employee
 from logistica_hr.performance.models import DailyWorkLog
+from django.db.models import Q
 from tests.factories import (
     AdminUserFactory,
     SupervisorUserFactory,
@@ -361,4 +362,366 @@ class TestAPIDashboardStats:
         assert response.status_code == 200
         data = json.loads(response.content)
         # Verificar estructura de respuesta
+
+
+@pytest.mark.django_db
+@pytest.mark.views
+class TestAccessDeniedView:
+    """Pruebas para la vista access_denied_view"""
+
+    def test_access_denied_view_accessible(self, client):
+        """Probar que access_denied_view es accesible sin autenticación"""
+        url = reverse('access_denied')
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'auth/access_denied.html' in [t.name for t in response.templates]
+
+    def test_access_denied_view_with_authenticated_user(self, client):
+        """Probar que access_denied_view funciona con usuario autenticado"""
+        user = AdminUserFactory()
+        client.force_login(user)
+        
+        url = reverse('access_denied')
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'user' in response.context
+        assert response.context['user'] == user
+
+
+@pytest.mark.django_db
+@pytest.mark.views
+class TestAdminEmployeesList:
+    """Pruebas para la vista admin_employees_list"""
+
+    def test_admin_employees_list_requires_login(self, client):
+        """Probar que admin_employees_list requiere autenticación"""
+        url = reverse('admin_employees_list')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/users/login' in response.url
+
+    def test_admin_employees_list_requires_admin(self, client):
+        """Probar que admin_employees_list requiere rol admin"""
+        employee_user = EmployeeUserFactory()
+        client.force_login(employee_user)
+        
+        url = reverse('admin_employees_list')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/access-denied/' in response.url or 'access_denied' in response.url
+
+    def test_admin_employees_list_shows_employees(self, client):
+        """Probar que admin_employees_list muestra empleados"""
+        admin = AdminUserFactory()
+        client.force_login(admin)
+        
+        employee1 = EmployeeFactory()
+        employee2 = EmployeeFactory()
+        
+        url = reverse('admin_employees_list')
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'employees_data' in response.context
+        employee_ids = [emp['employee'].id for emp in response.context['employees_data']]
+        assert employee1.id in employee_ids
+        assert employee2.id in employee_ids
+
+    def test_admin_employees_list_search_filter(self, client):
+        """Probar filtro de búsqueda en admin_employees_list"""
+        admin = AdminUserFactory()
+        client.force_login(admin)
+        
+        employee = EmployeeFactory()
+        employee.user.first_name = "Juan"
+        employee.user.save()
+        
+        url = reverse('admin_employees_list')
+        response = client.get(url, {'search': 'Juan'})
+        
+        assert response.status_code == 200
+        assert 'employees_data' in response.context
+        assert len(response.context['employees_data']) > 0
+        assert any('Juan' in emp['employee'].user.first_name for emp in response.context['employees_data'])
+
+    def test_admin_employees_list_supervisor_filter(self, client):
+        """Probar filtro por supervisor en admin_employees_list"""
+        admin = AdminUserFactory()
+        supervisor = SupervisorUserFactory()
+        client.force_login(admin)
+        
+        employee = EmployeeFactory(supervisor=supervisor)
+        
+        url = reverse('admin_employees_list')
+        response = client.get(url, {'supervisor': supervisor.id})
+        
+        assert response.status_code == 200
+        assert 'employees_data' in response.context
+        employee_ids = [emp['employee'].id for emp in response.context['employees_data']]
+        assert employee.id in employee_ids
+
+
+@pytest.mark.django_db
+@pytest.mark.views
+class TestAdminAssignSupervisor:
+    """Pruebas para la vista admin_assign_supervisor"""
+
+    def test_admin_assign_supervisor_requires_login(self, client):
+        """Probar que admin_assign_supervisor requiere autenticación"""
+        employee = EmployeeFactory()
+        url = reverse('admin_assign_supervisor', args=[employee.id])
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/users/login' in response.url
+
+    def test_admin_assign_supervisor_requires_admin(self, client):
+        """Probar que admin_assign_supervisor requiere rol admin"""
+        employee_user = EmployeeUserFactory()
+        employee = EmployeeFactory()
+        client.force_login(employee_user)
+        
+        url = reverse('admin_assign_supervisor', args=[employee.id])
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/access-denied/' in response.url or 'access_denied' in response.url
+
+    def test_admin_assign_supervisor_get_shows_form(self, client):
+        """Probar que GET muestra el formulario"""
+        admin = AdminUserFactory()
+        employee = EmployeeFactory()
+        client.force_login(admin)
+        
+        url = reverse('admin_assign_supervisor', args=[employee.id])
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'employee' in response.context
+        assert 'supervisors' in response.context
+        assert response.context['employee'] == employee
+
+    def test_admin_assign_supervisor_post_assigns_supervisor(self, client):
+        """Probar que POST asigna supervisor"""
+        admin = AdminUserFactory()
+        supervisor = SupervisorUserFactory()
+        employee = EmployeeFactory(supervisor=None)
+        client.force_login(admin)
+        
+        url = reverse('admin_assign_supervisor', args=[employee.id])
+        response = client.post(url, {'supervisor_id': supervisor.id})
+        
+        assert response.status_code == 302
+        employee.refresh_from_db()
+        assert employee.supervisor == supervisor
+
+    def test_admin_assign_supervisor_post_removes_supervisor(self, client):
+        """Probar que POST puede remover supervisor"""
+        admin = AdminUserFactory()
+        supervisor = SupervisorUserFactory()
+        employee = EmployeeFactory(supervisor=supervisor)
+        client.force_login(admin)
+        
+        url = reverse('admin_assign_supervisor', args=[employee.id])
+        response = client.post(url, {'supervisor_id': ''})
+        
+        assert response.status_code == 302
+        employee.refresh_from_db()
+        assert employee.supervisor is None
+
+    def test_admin_assign_supervisor_nonexistent_employee(self, client):
+        """Probar asignar supervisor a empleado inexistente"""
+        admin = AdminUserFactory()
+        client.force_login(admin)
+        
+        url = reverse('admin_assign_supervisor', args=[99999])
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/admin/employees/' in response.url or 'admin_employees_list' in response.url
+
+
+@pytest.mark.django_db
+@pytest.mark.views
+class TestSupervisorEmployeesList:
+    """Pruebas para la vista supervisor_employees_list"""
+
+    def test_supervisor_employees_list_requires_login(self, client):
+        """Probar que supervisor_employees_list requiere autenticación"""
+        url = reverse('supervisor_employees_list')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/users/login' in response.url
+
+    def test_supervisor_employees_list_requires_supervisor(self, client):
+        """Probar que supervisor_employees_list requiere rol supervisor"""
+        employee_user = EmployeeUserFactory()
+        client.force_login(employee_user)
+        
+        url = reverse('supervisor_employees_list')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/access-denied/' in response.url or 'access_denied' in response.url
+
+    def test_supervisor_employees_list_shows_supervised_employees(self, client):
+        """Probar que supervisor_employees_list muestra empleados supervisados"""
+        supervisor = SupervisorUserFactory()
+        client.force_login(supervisor)
+        
+        employee1 = EmployeeFactory(supervisor=supervisor)
+        employee2 = EmployeeFactory(supervisor=supervisor)
+        # Empleado de otro supervisor (no debería aparecer)
+        other_supervisor = SupervisorUserFactory()
+        employee3 = EmployeeFactory(supervisor=other_supervisor)
+        
+        url = reverse('supervisor_employees_list')
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'employees_data' in response.context
+        employee_ids = [emp['employee'].id for emp in response.context['employees_data']]
+        assert employee1.id in employee_ids
+        assert employee2.id in employee_ids
+        assert employee3.id not in employee_ids
+
+
+@pytest.mark.django_db
+@pytest.mark.views
+class TestSupervisorTeamReports:
+    """Pruebas para la vista supervisor_team_reports"""
+
+    def test_supervisor_team_reports_requires_login(self, client):
+        """Probar que supervisor_team_reports requiere autenticación"""
+        url = reverse('supervisor_team_reports')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/users/login' in response.url
+
+    def test_supervisor_team_reports_requires_supervisor(self, client):
+        """Probar que supervisor_team_reports requiere rol supervisor"""
+        employee_user = EmployeeUserFactory()
+        client.force_login(employee_user)
+        
+        url = reverse('supervisor_team_reports')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/access-denied/' in response.url or 'access_denied' in response.url
+
+    def test_supervisor_team_reports_shows_reports(self, client):
+        """Probar que supervisor_team_reports muestra reportes"""
+        supervisor = SupervisorUserFactory()
+        employee = EmployeeFactory(supervisor=supervisor)
+        client.force_login(supervisor)
+        
+        # Crear algunos registros de trabajo
+        DailyWorkLogFactory(employee=employee)
+        
+        url = reverse('supervisor_team_reports')
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'weekly_report' in response.context
+        assert 'monthly_report' in response.context
+        assert 'employee_performance' in response.context
+
+    def test_supervisor_team_reports_template(self, client):
+        """Probar que supervisor_team_reports usa el template correcto"""
+        supervisor = SupervisorUserFactory()
+        client.force_login(supervisor)
+        
+        url = reverse('supervisor_team_reports')
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'supervisor/team_reports.html' in [t.name for t in response.templates]
+
+
+@pytest.mark.django_db
+@pytest.mark.views
+class TestSupervisorEvaluatePerformance:
+    """Pruebas para la vista supervisor_evaluate_performance"""
+
+    def test_supervisor_evaluate_performance_requires_login(self, client):
+        """Probar que supervisor_evaluate_performance requiere autenticación"""
+        url = reverse('supervisor_evaluate_performance')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/users/login' in response.url
+
+    def test_supervisor_evaluate_performance_requires_supervisor(self, client):
+        """Probar que supervisor_evaluate_performance requiere rol supervisor"""
+        employee_user = EmployeeUserFactory()
+        client.force_login(employee_user)
+        
+        url = reverse('supervisor_evaluate_performance')
+        response = client.get(url)
+        
+        assert response.status_code == 302
+        assert '/access-denied/' in response.url or 'access_denied' in response.url
+
+    def test_supervisor_evaluate_performance_shows_employees(self, client):
+        """Probar que supervisor_evaluate_performance muestra empleados"""
+        supervisor = SupervisorUserFactory()
+        employee = EmployeeFactory(supervisor=supervisor)
+        client.force_login(supervisor)
+        
+        url = reverse('supervisor_evaluate_performance')
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'supervised_employees' in response.context
+        employee_ids = [emp.id for emp in response.context['supervised_employees']]
+        assert employee.id in employee_ids
+
+    def test_supervisor_evaluate_performance_with_employee_id(self, client):
+        """Probar que supervisor_evaluate_performance muestra datos de empleado específico"""
+        supervisor = SupervisorUserFactory()
+        employee = EmployeeFactory(supervisor=supervisor)
+        client.force_login(supervisor)
+        
+        # Crear registros de trabajo
+        DailyWorkLogFactory(employee=employee)
+        
+        url = reverse('supervisor_evaluate_employee', args=[employee.id])
+        response = client.get(url)
+        
+        assert response.status_code == 200
+        assert 'selected_employee' in response.context
+        assert response.context['selected_employee'] == employee
+        assert 'employee_performance' in response.context
+
+    def test_supervisor_evaluate_performance_invalid_employee_id(self, client):
+        """Probar que supervisor_evaluate_performance maneja empleado inválido"""
+        supervisor = SupervisorUserFactory()
+        client.force_login(supervisor)
+        
+        url = reverse('supervisor_evaluate_employee', args=[99999])
+        response = client.get(url)
+        
+        # Debería funcionar pero sin empleado seleccionado
+        assert response.status_code == 200
+        assert response.context['selected_employee'] is None
+
+    def test_supervisor_evaluate_performance_other_supervisor_employee(self, client):
+        """Probar que supervisor no puede ver empleados de otro supervisor"""
+        supervisor1 = SupervisorUserFactory()
+        supervisor2 = SupervisorUserFactory()
+        employee = EmployeeFactory(supervisor=supervisor2)
+        client.force_login(supervisor1)
+        
+        url = reverse('supervisor_evaluate_employee', args=[employee.id])
+        response = client.get(url)
+        
+        # Debería funcionar pero sin empleado seleccionado (no está bajo su supervisión)
+        assert response.status_code == 200
+        assert response.context['selected_employee'] is None
 

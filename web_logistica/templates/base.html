@@ -187,7 +187,7 @@
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-circle me-1 d-none d-sm-inline"></i>
-                        <span class="user-name-text">{{ user.username|default:"Usuario" }}</span>
+                        <span class="user-name-text">Ey {{ user.first_name }}!</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="fas fa-user me-2"></i>Perfil</a></li>

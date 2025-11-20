@@ -20,6 +20,10 @@ urlpatterns = [
     # Admin - Gestión de empleados
     path('admin/employees/', views.admin_employees_list, name='admin_employees_list'),
     path('admin/employees/<int:employee_id>/assign-supervisor/', views.admin_assign_supervisor, name='admin_assign_supervisor'),
+    path('admin/employees/<int:employee_id>/edit/', views.admin_edit_employee, name='admin_edit_employee'),
+    path('admin/employees/<int:employee_id>/delete/', views.admin_delete_employee, name='admin_delete_employee'),
+    path('admin/supervisors/<int:supervisor_id>/edit/', views.admin_edit_supervisor, name='admin_edit_supervisor'),
+    path('admin/supervisors/<int:supervisor_id>/delete/', views.admin_delete_supervisor, name='admin_delete_supervisor'),
     
     # Supervisor - Gestión de equipo
     path('supervisor/employees/', views.supervisor_employees_list, name='supervisor_employees_list'),

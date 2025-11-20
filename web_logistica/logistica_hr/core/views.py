@@ -14,7 +14,9 @@ import json
 from datetime import datetime, timedelta, date
 
 from logistica_hr.users.models import User
+from logistica_hr.users.forms import UserEditForm
 from logistica_hr.employees.models import Employee
+from logistica_hr.employees.forms import EmployeeEditForm
 from logistica_hr.tasks.models import Task
 from logistica_hr.performance.models import DailyWorkLog, EmployeePerformance
 
@@ -544,13 +546,23 @@ def admin_employees_list(request):
             'week_performance': week_performance,
         })
     
-    # Obtener supervisores para filtros
+    # Obtener supervisores para filtros y mostrar en la lista
     supervisors = User.objects.filter(role='supervisor').order_by('first_name', 'last_name')
+    
+    # Preparar datos de supervisores para mostrar
+    supervisors_data = []
+    for supervisor in supervisors:
+        employees_count = Employee.objects.filter(supervisor=supervisor).count()
+        supervisors_data.append({
+            'supervisor': supervisor,
+            'employees_count': employees_count,
+        })
     
     context = {
         'user': request.user,
         'employees_data': employees_data,
         'supervisors': supervisors,
+        'supervisors_data': supervisors_data,
         'search_query': search_query,
         'supervisor_filter': supervisor_filter,
     }
@@ -602,6 +614,144 @@ def admin_assign_supervisor(request, employee_id):
     }
     
     return render(request, 'admin/assign_supervisor.html', context)
+
+
+@login_required
+def admin_edit_employee(request, employee_id):
+    """Editar un empleado"""
+    if not request.user.is_admin():
+        return redirect('access_denied')
+    
+    try:
+        employee = Employee.objects.select_related('user').get(id=employee_id)
+    except Employee.DoesNotExist:
+        messages.error(request, 'Empleado no encontrado.')
+        return redirect('admin_employees_list')
+    
+    if request.method == 'POST':
+        user_form = UserEditForm(request.POST, instance=employee.user)
+        employee_form = EmployeeEditForm(request.POST, instance=employee)
+        
+        if user_form.is_valid() and employee_form.is_valid():
+            user_form.save()
+            employee_form.save()
+            messages.success(request, f'Empleado {employee.user.full_name} actualizado correctamente.')
+            return redirect('admin_employees_list')
+    else:
+        user_form = UserEditForm(instance=employee.user)
+        employee_form = EmployeeEditForm(instance=employee)
+    
+    context = {
+        'user': request.user,
+        'employee': employee,
+        'user_form': user_form,
+        'employee_form': employee_form,
+    }
+    
+    return render(request, 'admin/edit_employee.html', context)
+
+
+@login_required
+def admin_delete_employee(request, employee_id):
+    """Eliminar un empleado"""
+    if not request.user.is_admin():
+        return redirect('access_denied')
+    
+    try:
+        employee = Employee.objects.select_related('user').get(id=employee_id)
+    except Employee.DoesNotExist:
+        messages.error(request, 'Empleado no encontrado.')
+        return redirect('admin_employees_list')
+    
+    # Prevenir eliminación del propio usuario
+    if employee.user == request.user:
+        messages.error(request, 'No puedes eliminar tu propia cuenta.')
+        return redirect('admin_employees_list')
+    
+    employee_name = employee.user.full_name
+    
+    if request.method == 'POST':
+        # Eliminar el usuario (esto eliminará el empleado por CASCADE)
+        employee.user.delete()
+        messages.success(request, f'Empleado {employee_name} eliminado correctamente.')
+        return redirect('admin_employees_list')
+    
+    context = {
+        'user': request.user,
+        'employee': employee,
+    }
+    
+    return render(request, 'admin/delete_employee.html', context)
+
+
+@login_required
+def admin_edit_supervisor(request, supervisor_id):
+    """Editar un supervisor"""
+    if not request.user.is_admin():
+        return redirect('access_denied')
+    
+    try:
+        supervisor = User.objects.get(id=supervisor_id, role='supervisor')
+    except User.DoesNotExist:
+        messages.error(request, 'Supervisor no encontrado.')
+        return redirect('admin_employees_list')
+    
+    if request.method == 'POST':
+        form = UserEditForm(request.POST, instance=supervisor)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Supervisor {supervisor.full_name} actualizado correctamente.')
+            return redirect('admin_employees_list')
+    else:
+        form = UserEditForm(instance=supervisor)
+    
+    context = {
+        'user': request.user,
+        'supervisor': supervisor,
+        'form': form,
+    }
+    
+    return render(request, 'admin/edit_supervisor.html', context)
+
+
+@login_required
+def admin_delete_supervisor(request, supervisor_id):
+    """Eliminar un supervisor"""
+    if not request.user.is_admin():
+        return redirect('access_denied')
+    
+    try:
+        supervisor = User.objects.get(id=supervisor_id, role='supervisor')
+    except User.DoesNotExist:
+        messages.error(request, 'Supervisor no encontrado.')
+        return redirect('admin_employees_list')
+    
+    # Prevenir eliminación del propio usuario
+    if supervisor == request.user:
+        messages.error(request, 'No puedes eliminar tu propia cuenta.')
+        return redirect('admin_employees_list')
+    
+    # Verificar si tiene empleados asignados
+    employees_count = Employee.objects.filter(supervisor=supervisor).count()
+    supervisor_name = supervisor.full_name
+    
+    if request.method == 'POST':
+        # Si tiene empleados, remover la asignación primero
+        if employees_count > 0:
+            Employee.objects.filter(supervisor=supervisor).update(supervisor=None)
+            messages.info(request, f'Se removieron {employees_count} empleado(s) del supervisor antes de eliminarlo.')
+        
+        supervisor.delete()
+        messages.success(request, f'Supervisor {supervisor_name} eliminado correctamente.')
+        return redirect('admin_employees_list')
+    
+    context = {
+        'user': request.user,
+        'supervisor': supervisor,
+        'employees_count': employees_count,
+    }
+    
+    return render(request, 'admin/delete_supervisor.html', context)
 
 
 def access_denied_view(request):

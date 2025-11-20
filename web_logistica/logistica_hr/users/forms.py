@@ -99,6 +99,10 @@ class RegistrationForm(forms.ModelForm):
         """Teléfono chileno: exactamente 9 dígitos y comienza con 9."""
         phone = (self.cleaned_data.get("phone") or "").strip()
 
+        # Teléfono es obligatorio
+        if not phone:
+            raise ValidationError("El teléfono es obligatorio.")
+
         # Solo números
         if not phone.isdigit():
             raise ValidationError("El teléfono solo debe contener números.")

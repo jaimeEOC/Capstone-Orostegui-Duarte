@@ -159,3 +159,88 @@ class RegistrationForm(forms.ModelForm):
 
         return user
 
+
+class UserEditForm(forms.ModelForm):
+    """
+    Formulario para editar usuarios (sin contraseña obligatoria)
+    """
+    
+    class Meta:
+        model = User
+        fields = ["email", "first_name", "last_name", "role", "phone"]
+        widgets = {
+            "email": forms.EmailInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "correo@empresa.com",
+                    "id": "id_email",
+                }
+            ),
+            "first_name": forms.TextInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "Nombre",
+                    "id": "id_first_name",
+                }
+            ),
+            "last_name": forms.TextInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "Apellido",
+                    "id": "id_last_name",
+                }
+            ),
+            "role": forms.Select(attrs={"class": "form-select", "id": "id_role"}),
+            "phone": forms.TextInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": "912345678",
+                    "id": "id_phone",
+                    "maxlength": "9",
+                    "inputmode": "numeric",
+                    "pattern": "9\\d{8}",
+                    "title": "Debe comenzar con 9 y tener 9 dígitos"
+                }
+            ),
+        }
+
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip().lower()
+
+        if not email:
+            raise ValidationError("El correo es obligatorio.")
+
+        # Buscar en la BD si ya existe ese correo
+        qs = User.objects.filter(email__iexact=email)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise ValidationError(
+                "Ya existe una cuenta registrada con este correo."
+            )
+
+        return email
+
+    def clean_phone(self):
+        """Teléfono chileno: exactamente 9 dígitos y comienza con 9."""
+        phone = (self.cleaned_data.get("phone") or "").strip()
+
+        # Teléfono es obligatorio
+        if not phone:
+            raise ValidationError("El teléfono es obligatorio.")
+
+        # Solo números
+        if not phone.isdigit():
+            raise ValidationError("El teléfono solo debe contener números.")
+
+        # Largo exacto
+        if len(phone) != 9:
+            raise ValidationError("El teléfono debe tener exactamente 9 dígitos.")
+
+        # Celular chileno: debe empezar con 9
+        if not phone.startswith("9"):
+            raise ValidationError("El teléfono debe comenzar con 9.")
+
+        return phone
+

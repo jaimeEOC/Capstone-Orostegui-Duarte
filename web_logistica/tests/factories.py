@@ -2,16 +2,19 @@
 Factories para crear datos de prueba usando Factory Boy
 """
 
+from datetime import datetime, timedelta
+
 import factory
 from django.contrib.auth import get_user_model
 
-from logistica_hr.employees.models import Department, Employee, Position
+from logistica_hr.employees.models import Department, Employee, Position, WorkSchedule
 from logistica_hr.performance.models import (
     DailyWorkLog,
     EmployeePerformance,
+    PerformanceEvaluation,
     PerformanceMetric,
 )
-from logistica_hr.tasks.models import Task, TaskCategory
+from logistica_hr.tasks.models import Task, TaskCategory, TaskTimeLog, TaskComment
 
 User = get_user_model()
 
@@ -152,10 +155,31 @@ class DailyWorkLogFactory(factory.django.DjangoModelFactory):
     trucks_received = factory.Faker("pyint", min_value=0, max_value=20)
     trucks_dispatched = factory.Faker("pyint", min_value=0, max_value=20)
     quality_score = factory.Faker(
-        "pydecimal", left_digits=1, right_digits=2, positive=True, max_value=1.0
+        "pydecimal", left_digits=1, right_digits=2, positive=True, max_value=7.0
     )
     safety_incidents = factory.Faker("pyint", min_value=0, max_value=5)
     notes = factory.Faker("text", max_nb_chars=200)
+
+
+class PerformanceEvaluationFactory(factory.django.DjangoModelFactory):
+    """Factory para crear evaluaciones de rendimiento"""
+
+    class Meta:
+        model = PerformanceEvaluation
+
+    employee = factory.SubFactory(EmployeeFactory)
+    evaluation_type = factory.Iterator(
+        ["daily", "weekly", "monthly", "quarterly", "annual"]
+    )
+    start_date = factory.Faker("date_this_year")
+    end_date = factory.Faker("date_this_year")
+    overall_score = factory.Faker(
+        "pydecimal", left_digits=3, right_digits=2, positive=True, max_value=100.0
+    )
+    evaluated_by = factory.SubFactory(SupervisorUserFactory)
+    strengths = factory.Faker("text", max_nb_chars=200)
+    areas_for_improvement = factory.Faker("text", max_nb_chars=200)
+    recommendations = factory.Faker("text", max_nb_chars=200)
 
 
 class TaskCategoryFactory(factory.django.DjangoModelFactory):
@@ -182,3 +206,49 @@ class TaskFactory(factory.django.DjangoModelFactory):
     priority = factory.Iterator(["low", "medium", "high", "urgent"])
     status = factory.Iterator(["pending", "in_progress", "completed", "cancelled"])
     due_date = factory.Faker("future_date", end_date="+30d")
+
+
+class TaskTimeLogFactory(factory.django.DjangoModelFactory):
+    """Factory para crear registros de tiempo de tareas"""
+
+    class Meta:
+        model = TaskTimeLog
+
+    task = factory.SubFactory(TaskFactory)
+    employee = factory.SubFactory(EmployeeFactory)
+    start_time = factory.Faker("date_time_this_year")
+    end_time = factory.LazyAttribute(
+        lambda obj: obj.start_time + timedelta(hours=2) if obj.start_time else None
+    )
+    description = factory.Faker("text", max_nb_chars=200)
+    is_break = False
+
+
+class TaskCommentFactory(factory.django.DjangoModelFactory):
+    """Factory para crear comentarios de tareas"""
+
+    class Meta:
+        model = TaskComment
+
+    task = factory.SubFactory(TaskFactory)
+    author = factory.SubFactory(EmployeeUserFactory)
+    content = factory.Faker("text", max_nb_chars=500)
+    is_internal = False
+
+
+class WorkScheduleFactory(factory.django.DjangoModelFactory):
+    """Factory para crear horarios de trabajo"""
+
+    class Meta:
+        model = WorkSchedule
+
+    employee = factory.SubFactory(EmployeeFactory)
+    day_of_week = factory.Iterator([0, 1, 2, 3, 4, 5, 6])  # Lunes a Domingo
+    start_time = factory.Faker("time_object")
+    end_time = factory.LazyAttribute(
+        lambda obj: (datetime.combine(datetime.today(), obj.start_time) + timedelta(hours=8)).time()
+        if obj.start_time
+        else None
+    )
+    break_start = None
+    break_end = None

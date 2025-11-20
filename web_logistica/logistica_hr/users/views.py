@@ -5,7 +5,7 @@ Vistas para la aplicación users
 import json
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
@@ -17,6 +17,7 @@ from django.views.generic import FormView
 
 from .forms import RegistrationForm
 
+User = get_user_model()
 
 class LoginView(View):
     """
@@ -36,17 +37,29 @@ class LoginView(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
-        """Procesa el formulario de login"""
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        """Procesa el formulario de login (por correo)"""
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "")
 
-        if not username or not password:
+        if not email or not password:
             messages.error(request, "Por favor, completa todos los campos.")
             context = {'show_session_warning': True}
             return render(request, self.template_name, context)
 
-        # Autenticar usuario
-        user = authenticate(request, username=username, password=password)
+        user = None
+
+        try:
+            # Buscar usuario por correo (case-insensitive)
+            user_obj = User.objects.get(email__iexact=email)
+
+            # Autenticar usando el USERNAME interno
+            user = authenticate(
+                request,
+                username=user_obj.username,
+                password=password,
+            )
+        except User.DoesNotExist:
+            user = None
 
         if user is not None:
             if user.is_active:
@@ -62,10 +75,11 @@ class LoginView(View):
             else:
                 messages.error(request, "Tu cuenta está desactivada.")
         else:
-            messages.error(request, "Usuario o contraseña incorrectos.")
+            messages.error(request, "Correo o contraseña incorrectos.")
 
         context = {'show_session_warning': True}
         return render(request, self.template_name, context)
+
 
     def get_redirect_url(self, user):
         """Retorna la URL de redirección según el rol del usuario"""

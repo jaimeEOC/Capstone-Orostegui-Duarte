@@ -234,6 +234,24 @@
         background: #cbd5e0;
     }
     
+    .action-btn.edit {
+        background: #48bb78;
+        color: white;
+    }
+    
+    .action-btn.edit:hover {
+        background: #38a169;
+    }
+    
+    .action-btn.delete {
+        background: #f56565;
+        color: white;
+    }
+    
+    .action-btn.delete:hover {
+        background: #e53e3e;
+    }
+    
     @media (max-width: 768px) {
         .filters-grid {
             grid-template-columns: 1fr;
@@ -356,8 +374,14 @@
             </div>
             
             <div class="employee-actions">
-                <a href="{% url 'admin_assign_supervisor' data.employee.id %}" class="action-btn assign" style="width: 100%;">
-                    <i class="fas fa-user-tie"></i> Asignar Supervisor
+                <a href="{% url 'admin_assign_supervisor' data.employee.id %}" class="action-btn assign">
+                    <i class="fas fa-user-tie"></i> Supervisor
+                </a>
+                <a href="{% url 'admin_edit_employee' data.employee.id %}" class="action-btn edit">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <a href="{% url 'admin_delete_employee' data.employee.id %}" class="action-btn delete">
+                    <i class="fas fa-trash"></i> Eliminar
                 </a>
             </div>
         </div>
@@ -368,6 +392,63 @@
         <i class="fas fa-users" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
         <h3 style="color: #4a5568;">No se encontraron empleados</h3>
         <p style="color: #718096;">Intenta ajustar los filtros de búsqueda.</p>
+    </div>
+    {% endif %}
+    
+    <!-- Lista de Supervisores -->
+    {% if supervisors_data %}
+    <div style="margin-top: 3rem;">
+        <h2 style="color: #2d3748; margin-bottom: 1.5rem; font-size: 1.5rem;">
+            <i class="fas fa-user-tie"></i> Supervisores
+        </h2>
+        <div class="employees-grid">
+            {% for data in supervisors_data %}
+            <div class="employee-card">
+                <div class="employee-header">
+                    <div class="employee-avatar" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="employee-info">
+                        <h3 class="employee-name">{{ data.supervisor.full_name }}</h3>
+                        <div class="employee-position">
+                            Supervisor
+                        </div>
+                        <div class="employee-supervisor">
+                            <i class="fas fa-users"></i> {{ data.employees_count }} empleado(s) asignado(s)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="employee-status {% if data.supervisor.is_active %}status-active{% else %}status-inactive{% endif %}">
+                    {% if data.supervisor.is_active %}
+                        <i class="fas fa-check-circle"></i> Activo
+                    {% else %}
+                        <i class="fas fa-times-circle"></i> Inactivo
+                    {% endif %}
+                </div>
+                
+                <div class="performance-stats">
+                    <div class="stat-row">
+                        <span class="stat-label">Correo:</span>
+                        <span class="stat-value" style="font-size: 0.85rem;">{{ data.supervisor.email }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Teléfono:</span>
+                        <span class="stat-value">{{ data.supervisor.phone|default:"No registrado" }}</span>
+                    </div>
+                </div>
+                
+                <div class="employee-actions">
+                    <a href="{% url 'admin_edit_supervisor' data.supervisor.id %}" class="action-btn edit">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'admin_delete_supervisor' data.supervisor.id %}" class="action-btn delete">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 </div>

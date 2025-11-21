@@ -12,9 +12,9 @@
 {% block extra_head %}
 <style>
     .phone-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
+        position: relative;
+        display: flex;
+        align-items: center;
     }
 
     .input-prefix {
@@ -31,15 +31,15 @@
     }
 
     .prefix-divider::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1px;           
-    height: 70%;          
-    background-color: #94a3b8; 
-    border-radius: 2px;
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 70%;
+        background-color: #94a3b8;
+        border-radius: 2px;
     }
 
     #id_phone {
@@ -57,19 +57,10 @@
     }
 
     .register-container {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        padding: 2.5rem;
-        width: 100%;
-        position: relative;
-        overflow: hidden;
-    }
-    .register-container {
-        background: #eef2ff; 
+        background: #eef2ff;
         border: 1px solid #c7d2fe;
         border-radius: 14px;
-        box-shadow: 0 10px 35px rgba(55, 65, 81, 0.25); 
+        box-shadow: 0 10px 35px rgba(55, 65, 81, 0.25);
         padding: 2.5rem;
         width: 100%;
         position: relative;
@@ -139,7 +130,7 @@
         background: white;
         box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
     }
-    
+
     .form-select {
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
@@ -176,16 +167,6 @@
         background: #2980b9;
     }
 
-    .register-button:active {
-        transform: translateY(0);
-    }
-
-    .register-button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
-
     .alert {
         padding: 0.875rem 1rem;
         border-radius: 10px;
@@ -200,38 +181,10 @@
         border: 1px solid #feb2b2;
     }
 
-    .alert-success {
-        background: #c6f6d5;
-        color: #2f855a;
-        border: 1px solid #9ae6b4;
-    }
-
-    .alert-info {
-        background: #bee3f8;
-        color: #2b6cb0;
-        border: 1px solid #90cdf4;
-    }
-
     .form-text {
         font-size: 0.85rem;
         color: #718096;
         margin-top: 0.25rem;
-    }
-
-    .footer-links {
-        text-align: center;
-        margin-top: 1.5rem;
-    }
-
-    .footer-links a {
-        color: #3498db;
-        text-decoration: underline;
-        font-size: 0.9rem;
-        transition: color 0.3s ease;
-    }
-
-    .footer-links a:hover {
-        color: #2980b9;
     }
 
     .form-row {
@@ -249,19 +202,12 @@
             gap: 0;
         }
     }
-
-    @media (max-width: 480px) {
-        .register-container {
-            padding: 2rem;
-        }
-    }
 </style>
 {% endblock %}
 
 {% block content %}
-<pre>{{ form.errors }}</pre>
-
 <div class="register-container">
+
     <div class="logo-section">
         <div class="logo-icon">
             <i class="fas fa-user-plus"></i>
@@ -270,25 +216,9 @@
         <p class="logo-subtitle">Sistema de Gestión de Personal</p>
     </div>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
     {% if form.errors %}
         <div class="alert alert-error">
             Hay errores en el formulario. Revísalos por favor.
-        </div>
-    {% endif %}
-
-    {% if form.non_field_errors %}
-        <div class="alert alert-error">
-            {% for error in form.non_field_errors %}
-                {{ error }}<br>
-            {% endfor %}
         </div>
     {% endif %}
 
@@ -334,11 +264,11 @@
             {% endfor %}
         </div>
 
-
         <div class="form-group">
             <label for="id_role" class="form-label">Rol</label>
             {{ form.role }}
             <div class="form-text">Administrador / Supervisor / Empleado</div>
+
             {% for error in form.role.errors %}
                 <div class="text-danger small">{{ error }}</div>
             {% endfor %}
@@ -369,11 +299,13 @@
             <i class="fas fa-user-plus"></i>
             <span id="buttonText">Crear cuenta</span>
         </button>
+
     </form>
 
     <div class="footer-links">
         <a href="{% url 'users:login' %}">¿Ya tienes cuenta? Inicia sesión</a>
     </div>
+
 </div>
 {% endblock %}
 
@@ -384,18 +316,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const button = document.getElementById('registerButton');
     const buttonText = document.getElementById('buttonText');
 
-    form.addEventListener('submit', function(e) {
+    // Mantener focus azul sin cambios
+    const firstField = document.getElementById('id_email') || document.getElementById('id_first_name');
+    if (firstField) firstField.focus();
+
+    // Botón deshabilitado al enviar
+    form.addEventListener('submit', function() {
         button.disabled = true;
         buttonText.textContent = 'Creando cuenta...';
-        setTimeout(() => {
-        }, 500);
     });
-
-    // Ahora hacemos foco en el correo o el nombre
-    const firstField = document.getElementById('id_email') || document.getElementById('id_first_name');
-    if (firstField) {
-        firstField.focus();
-    }
 });
 </script>
 {% endblock %}

@@ -10,50 +10,54 @@
         margin: 0 auto;
         padding: 2rem 1rem;
     }
-    
+
+    /* HEADER MORADO */
     .dashboard-header {
-    background: linear-gradient(135deg, #162f4a 0%, #1e40af 100%);
-    color: white;
-    padding: 2rem;
-    border-radius: 15px;
-    margin-bottom: 2rem;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     }
-    
+
     .dashboard-title {
         font-size: 2.5rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
     }
-    
+
     .dashboard-subtitle {
         font-size: 1.1rem;
         opacity: 0.9;
     }
-    
+
+    /* GRID */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
-    
+
+    /* CARDS MORADAS */
     .stat-card {
-    background: linear-gradient(135deg, #162f4a 0%, #1e40af 100%);
-    border-radius: 15px;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    color: white;
-    transition: transform 0.3s ease;
+        background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+        color: white;
+        transition: transform 0.3s ease;
     }
-    
+
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(14, 36, 69, 0.45);
+        box-shadow: 0 6px 15px rgba(45, 16, 80, 0.55);
     }
-    
+
+    /* ICONOS (Arreglados — Morado) */
     .stat-icon {
         width: 60px;
         height: 60px;
@@ -61,338 +65,169 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
         background: white;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
     }
-    
-    .stat-icon.team { color: #60a5fa; }
-    .stat-icon.active { color: #34d399; }
+
+    .stat-icon.team { color: #8b5cf6; }
+    .stat-icon.active { color: #10b981; }
     .stat-icon.packages { color: #f59e0b; }
     .stat-icon.quality { color: #ec4899; }
     .stat-icon.incidents { color: #ef4444; }
-    
+
     .stat-number {
         font-size: 2rem;
         font-weight: 700;
-        color: white;
         margin-bottom: 0.5rem;
-    }
-    
-    .stat-label {
         color: white;
+    }
+
+    .stat-label {
         font-size: 0.9rem;
         font-weight: 600;
+        color: white;
     }
-    
+
     .stat-change {
-        font-size: 0.75rem;
-        margin-top: 0.5rem;
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
         gap: 0.25rem;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
     }
-    
-    .stat-change.positive {
-        color: #34d399;
-    }
-    
-    .stat-change.negative {
-        color: #fca5a5;
-    }
-    
-    .stat-change.neutral {
-        color: #d1d5db;
-    }
-    
+
+    .stat-change.positive { color: #34d399; }
+    .stat-change.negative { color: #fca5a5; }
+    .stat-change.neutral  { color: #d1d5db; }
+
+    /* CHART Y CONTENEDORES */
     .chart-container {
         background: white;
-        border-radius: 15px;
         padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         margin-bottom: 2rem;
     }
-    
-    .task-item.overdue {
-        border-left: 4px solid #ef4444;
-        background-color: #fef2f2;
-    }
-    
-    .task-item.overdue:hover {
-        background-color: #fee2e2;
-    }
-    
-    .comparison-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-    
-    .comparison-badge.positive {
-        background: rgba(52, 211, 153, 0.2);
-        color: #10b981;
-    }
-    
-    .comparison-badge.negative {
-        background: rgba(239, 68, 68, 0.2);
-        color: #ef4444;
-    }
-    
-    .comparison-badge.neutral {
-        background: rgba(209, 213, 219, 0.2);
-        color: #6b7280;
-    }
-    
+
     .content-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
         margin-bottom: 2rem;
     }
-    
+
     .main-content {
         background: white;
-        border-radius: 15px;
         padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    
+
     .section-title {
         font-size: 1.3rem;
         font-weight: 600;
         color: #2d3748;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
         border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.5rem;
     }
-    
-    .employee-list {
+
+    /* LISTAS */
+    .employee-list, .task-list {
         list-style: none;
-        padding: 0;
         margin: 0;
+        padding: 0;
     }
-    
-    .employee-item {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
+
+    .employee-item,
+    .task-item {
         border: 1px solid #e2e8f0;
         border-radius: 10px;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: inherit;
+        margin-bottom: .6rem;
+        padding: .9rem;
+        display: flex;
+        align-items: center;
+        transition: all .3s ease;
     }
-    
-    .employee-item:hover {
-        background-color: #f7fafc;
-        border-color: #3b82f6;
-        transform: translateX(5px);
-        text-decoration: none;
-        color: inherit;
+
+    .employee-item:hover,
+    .task-item:hover {
+        border-color: #6d28d9;
+        background: #f7f5ff;
+        transform: translateX(4px);
     }
-    
-    .employee-item-link {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
-    
+
+    /* AVATAR */
     .employee-avatar {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #e2e8f0;
+        background: #e9d5ff;
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
+        color: #4c1d95;
+        font-size: 1rem;
         margin-right: 1rem;
-        font-size: 0.9rem;
-        color: #4a5568;
     }
-    
-    .employee-info {
-        flex: 1;
-    }
-    
-    .employee-name {
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 0.25rem;
-    }
-    
-    .employee-position {
-        color: #718096;
-        font-size: 0.9rem;
-    }
-    
+
+    /* STATUS */
     .employee-status {
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 600;
     }
-    
-    .status-active {
-        background: #c6f6d5;
-        color: #2f855a;
-    }
-    
-    .status-inactive {
-        background: #fed7d7;
-        color: #c53030;
-    }
-    
-    .task-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .task-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .task-item:hover {
-        background-color: #f7fafc;
-        border-color: #3b82f6;
-        transform: translateX(3px);
-    }
-    
-    .task-item-link {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .task-priority {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 0.75rem;
-    }
-    
-    .priority-high { background: #e53e3e; }
-    .priority-medium { background: #dd6b20; }
-    .priority-low { background: #38a169; }
-    
-    .task-content {
-        flex: 1;
-    }
-    
-    .task-title {
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 0.25rem;
-    }
-    
-    .task-assigned {
-        color: #718096;
-        font-size: 0.9rem;
-    }
-    
-    .task-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-    
-    .status-pending {
-        background: #fed7d7;
-        color: #c53030;
-    }
-    
-    .status-progress {
-        background: #fef5e7;
-        color: #dd6b20;
-    }
-    
-    .performance-summary {
-        background: #f7fafc;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-top: 1rem;
-    }
-    
-    .performance-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-    
-    .performance-item:last-child {
-        border-bottom: none;
-    }
-    
-    .performance-label {
-        color: #4a5568;
-        font-weight: 600;
-    }
-    
-    .performance-value {
-        color: #2d3748;
-        font-weight: 700;
-    }
-    
+
+    .status-active { background:#c6f6d5; color:#2f855a; }
+    .status-inactive { background:#fed7d7; color:#c53030; }
+
+    /* PRIORIDAD */
+    .task-priority { width:8px;height:8px;border-radius:50%;margin-right:.8rem; }
+    .priority-high { background:#e53e3e; }
+    .priority-medium { background:#dd6b20; }
+    .priority-low { background:#10b981; }
+
+    /* BOTONES QUICK ACTIONS */
     .quick-actions {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+        gap:1rem;
+        margin-top:1rem;
     }
-    
+
     .action-button {
-    background: linear-gradient(135deg, #162f4a 0%, #1e40af 100%);
-    color: white;
-    padding: 1.5rem 1rem;
-    border-radius: 15px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
+        background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+        padding:1.5rem 1rem;
+        border-radius:15px;
+        text-align:center;
+        color:white;
+        font-weight:600;
+        text-decoration:none;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:.7rem;
+        transition:.3s;
     }
-    
+
     .action-button:hover {
-    background: linear-gradient(135deg, #112539 0%, #1e3a8a 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(10, 23, 42, 0.45);
-    color: white;
+        background: linear-gradient(135deg, #3b1c7a 0%, #5b21b6 100%);
+        transform:translateY(-3px);
+        box-shadow:0 6px 12px rgba(40,15,85,0.5);
     }
-    
-    .action-icon {
-        font-size: 1.8rem;
-    }
-    
-    @media (max-width: 768px) {
-        .content-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .stats-grid {
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        }
+
+    .action-icon { font-size:1.8rem; }
+
+    @media (max-width: 768px){
+        .content-grid{grid-template-columns:1fr;}
+        .stats-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));}
     }
 </style>
 {% endblock %}
+
 
 {% block content %}
 <div class="dashboard-container">

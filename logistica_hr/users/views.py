@@ -231,34 +231,29 @@ class RegisterView(FormView):
 
     def form_valid(self, form):
         """Procesar formulario válido"""
-        try:
-            # Crear usuario
-            user = form.save()
+        # Aquí NO usamos try/except que silencie errores
+        user = form.save()
 
-            # Auto-login después del registro
-            raw_password = form.cleaned_data.get("password1")
-            user = authenticate(
-                self.request, username=user.username, password=raw_password
-            )
+        raw_password = form.cleaned_data.get("password1")
 
-            if user is not None:
-                login(self.request, user)
-                messages.success(
-                    self.request,
-                    f"¡Bienvenido, {user.full_name}! "
-                    f"Tu cuenta ha sido creada exitosamente.",
-                )
-                return redirect(self.get_success_url())
-            else:
-                messages.success(
-                    self.request,
-                    "¡Usuario creado exitosamente! Por favor, inicia sesión.",
-                )
-                return redirect("users:login")
+        user = authenticate(
+            self.request,
+            username=user.username,
+            password=raw_password
+        )
 
-        except Exception as e:
-            messages.error(self.request, f"Error al crear la cuenta: {str(e)}")
-            return self.form_invalid(form)
+        if user:
+            login(self.request, user)
+
+            # borrar mensajes arrastrados
+            messages.get_messages(self.request).used = True
+
+            return redirect(self.get_success_url())
+
+        # Si por alguna razón no se pudo autenticar:
+        messages.get_messages(self.request).used = True
+        return redirect("users:login")
+
 
     def get_success_url(self):
         """Obtener URL de redirección después del registro exitoso"""

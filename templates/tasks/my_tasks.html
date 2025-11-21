@@ -5,10 +5,23 @@
 
 {% block content %}
 <div style="max-width:1200px;margin:0 auto;padding:2rem 1rem;">
-  <div style="background:linear-gradient(135deg,#38a169 0%,#48bb78 100%);color:#fff;padding:2rem;border-radius:15px;margin-bottom:2rem;text-align:center;">
-    <h1 style="font-size:2rem;font-weight:700;margin:0 0 .25rem 0;">Mis Tareas</h1>
-    <p style="opacity:.9;margin:0;">Hola, {{ user.get_full_name|default:user.username }}</p>
+  <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+              color:#fff;
+              padding:2rem;
+              border-radius:15px;
+              margin-bottom:2rem;
+              text-align:center;">
+      
+    <h1 style="font-size:2rem;font-weight:700;margin:0 0 .25rem 0;">
+        Mis Tareas
+    </h1>
+
+    <p style="opacity:.9;margin:0;">
+        Hola, {{ user.get_full_name|default:user.username }}
+    </p>
+
   </div>
+
 
   <div style="background:#fff;border-radius:15px;padding:1.25rem;box-shadow:0 4px 6px rgba(0,0,0,.08);">
     <h2 style="font-size:1.2rem;font-weight:700;color:#2d3748;margin:0 0 1rem 0;padding-bottom:.5rem;border-bottom:2px solid #e2e8f0;">Listado</h2>

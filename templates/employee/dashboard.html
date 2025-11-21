@@ -12,7 +12,8 @@
     }
     
     .dashboard-header {
-        background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
+        /* Claro izquierda (#3b82f6), oscuro derecha (#1e4a72) */
+        background: linear-gradient(135deg, #3b82f6 0%, #1e4a72 100%);
         color: white;
         padding: 2rem;
         border-radius: 15px;
@@ -49,7 +50,8 @@
     }
     
     .stat-card {
-        background: linear-gradient(135deg, #1e4a72, #3b82f6);
+        /* Igual: claro izquierda, oscuro derecha */
+        background: linear-gradient(135deg, #3b82f6 0%, #1e4a72 100%);
         border-radius: 15px;
         padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -239,7 +241,8 @@
     }
     
     .action-button {
-        background: linear-gradient(135deg, #1e4a72, #3b82f6);
+        /* Claro izquierda, oscuro derecha */
+        background: linear-gradient(135deg, #3b82f6 0%, #1e4a72 100%);
         color: white;
         padding: 1.5rem 1rem;
         border-radius: 15px;
@@ -255,9 +258,10 @@
     }
     
     .action-button:hover {
+        /* Un pelito más oscuro a la derecha en hover */
+        background: linear-gradient(135deg, #2563eb 0%, #163555 100%);
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(30, 74, 114, 0.4);
-        background: linear-gradient(135deg, #1a3d5f, #2563eb);
+        box-shadow: 0 6px 12px rgba(22, 53, 85, 0.45);
         color: white;
         text-decoration: none;
     }
@@ -460,7 +464,6 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-// Datos del gráfico
 const chartData = {
     labels: {{ chart_data.labels|safe }},
     packages: {{ chart_data.packages|safe }},
@@ -468,7 +471,6 @@ const chartData = {
     trucks: {{ chart_data.trucks|safe }}
 };
 
-// Crear gráfico de rendimiento
 const ctx = document.getElementById('performanceChart');
 if (ctx) {
     new Chart(ctx, {
@@ -571,7 +573,6 @@ if (ctx) {
     });
 }
 
-// Actualizar estadísticas cada 30 segundos
 setInterval(function() {
     fetch('/api/dashboard/stats/')
         .then(response => response.json())

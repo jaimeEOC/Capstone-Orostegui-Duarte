@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Supervisor - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .warning-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .warning-icon {
+        font-size: 4rem;
+        color: #f56565;
+        margin-bottom: 1rem;
+    }
+    
+    .warning-message {
+        font-size: 1.1rem;
+        color: #2d3748;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    
+    .supervisor-info {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #4a5568;
+    }
+    
+    .info-value {
+        color: #2d3748;
+    }
+    
+    .employees-warning {
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: #c53030;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .btn {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    
+    .btn-danger {
+        background: #f56565;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #e53e3e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #2d3748;
+    }
+    
+    .btn-secondary:hover {
+        background: #cbd5e0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-exclamation-triangle"></i> Eliminar Supervisor
+        </h1>
+    </div>
+    
+    <div class="warning-card">
+        <div class="warning-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        
+        <div class="warning-message">
+            <strong>¿Estás seguro de que deseas eliminar este supervisor?</strong><br>
+            Esta acción no se puede deshacer.
+        </div>
+        
+        {% if employees_count > 0 %}
+        <div class="employees-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>Advertencia:</strong> Este supervisor tiene {{ employees_count }} empleado(s) asignado(s). 
+            Se removerá la asignación de todos los empleados antes de eliminar al supervisor.
+        </div>
+        {% endif %}
+        
+        <div class="supervisor-info">
+            <h3 style="margin-bottom: 1rem; color: #2d3748;">Información del Supervisor</h3>
+            <div class="info-row">
+                <span class="info-label">Nombre:</span>
+                <span class="info-value">{{ supervisor.full_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Correo:</span>
+                <span class="info-value">{{ supervisor.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Rol:</span>
+                <span class="info-value">{{ supervisor.get_role_display }}</span>
+            </div>
+            {% if employees_count > 0 %}
+            <div class="info-row">
+                <span class="info-label">Empleados asignados:</span>
+                <span class="info-value">{{ employees_count }}</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <form method="post" id="deleteForm">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger" id="deleteButton">
+                    <i class="fas fa-trash"></i> Sí, Eliminar
+                </button>
+                <a href="{% url 'admin_employees_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteButton = document.getElementById('deleteButton');
+    
+    if (deleteForm && deleteButton) {
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const confirmMessage = {% if employees_count > 0 %}
+                'Este supervisor tiene {{ employees_count }} empleado(s) asignado(s). Se removerá la asignación de todos los empleados antes de eliminar al supervisor. ¿Estás completamente seguro de que deseas continuar?'
+            {% else %}
+                '¿Estás completamente seguro de que deseas eliminar este supervisor? Esta acción es irreversible.'
+            {% endif %};
+            
+            if (confirm(confirmMessage)) {
+                deleteForm.submit();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+

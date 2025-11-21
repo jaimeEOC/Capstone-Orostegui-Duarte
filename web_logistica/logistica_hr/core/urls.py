@@ -28,6 +28,7 @@ urlpatterns = [
     # Supervisor - Gestión de equipo
     path('supervisor/employees/', views.supervisor_employees_list, name='supervisor_employees_list'),
     path('supervisor/reports/', views.supervisor_team_reports, name='supervisor_team_reports'),
+    path('supervisor/reports/pdf/', views.supervisor_team_reports_pdf, name='supervisor_team_reports_pdf'),
     path('supervisor/evaluate/', views.supervisor_evaluate_performance, name='supervisor_evaluate_performance'),
     path('supervisor/evaluate/<int:employee_id>/', views.supervisor_evaluate_performance, name='supervisor_evaluate_employee'),
     

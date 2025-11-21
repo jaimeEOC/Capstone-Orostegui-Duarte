@@ -6,12 +6,20 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Avg, Sum, Q
 from django.utils.safestring import mark_safe
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from datetime import datetime, timedelta, date
+from io import BytesIO
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 
 from logistica_hr.users.models import User
 from logistica_hr.users.forms import UserEditForm
@@ -880,6 +888,198 @@ def supervisor_team_reports(request):
     }
     
     return render(request, 'supervisor/team_reports.html', context)
+
+
+@login_required
+def supervisor_team_reports_pdf(request):
+    """Generar PDF de reportes del equipo para supervisor"""
+    if not request.user.is_supervisor():
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('access_denied')
+    
+    today = datetime.now().date()
+    week_ago = today - timedelta(days=7)
+    month_ago = today - timedelta(days=30)
+    
+    # Empleados supervisados
+    supervised_employees = Employee.objects.filter(
+        supervisor=request.user
+    ).select_related('user', 'position')
+    
+    # Reporte semanal
+    weekly_report = DailyWorkLog.objects.filter(
+        employee__supervisor=request.user,
+        date__gte=week_ago
+    ).aggregate(
+        total_packages=Sum('packages_processed'),
+        total_trucks_received=Sum('trucks_received'),
+        total_trucks_dispatched=Sum('trucks_dispatched'),
+        avg_quality=Avg('quality_score'),
+        total_incidents=Sum('safety_incidents'),
+        total_work_logs=Count('id')
+    )
+    
+    # Reporte mensual
+    monthly_report = DailyWorkLog.objects.filter(
+        employee__supervisor=request.user,
+        date__gte=month_ago
+    ).aggregate(
+        total_packages=Sum('packages_processed'),
+        total_trucks_received=Sum('trucks_received'),
+        total_trucks_dispatched=Sum('trucks_dispatched'),
+        avg_quality=Avg('quality_score'),
+        total_incidents=Sum('safety_incidents'),
+        total_work_logs=Count('id')
+    )
+    
+    # Rendimiento por empleado (últimos 7 días)
+    employee_performance = []
+    for employee in supervised_employees:
+        perf = DailyWorkLog.objects.filter(
+            employee=employee,
+            date__gte=week_ago
+        ).aggregate(
+            avg_packages=Avg('packages_processed'),
+            avg_quality=Avg('quality_score'),
+            total_incidents=Sum('safety_incidents'),
+            days_worked=Count('id', distinct=True)
+        )
+        
+        employee_performance.append({
+            'employee': employee,
+            'performance': perf,
+        })
+    
+    # Ordenar por promedio de paquetes
+    employee_performance.sort(key=lambda x: x['performance']['avg_packages'] or 0, reverse=True)
+    
+    # Crear el PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    elements = []
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=20,
+        textColor=colors.HexColor('#1e4a72'),
+        spaceAfter=30,
+        alignment=TA_CENTER
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#2d3748'),
+        spaceAfter=12,
+        spaceBefore=12
+    )
+    
+    # Título
+    elements.append(Paragraph("Reportes del Equipo", title_style))
+    elements.append(Paragraph(f"Supervisor: {request.user.full_name}", styles['Normal']))
+    elements.append(Paragraph(f"Fecha de generación: {today.strftime('%d/%m/%Y')}", styles['Normal']))
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # Reporte Semanal
+    elements.append(Paragraph("Reporte Semanal (7 días)", heading_style))
+    weekly_data = [
+        ['Métrica', 'Valor'],
+        ['Total Paquetes', str(weekly_report['total_packages'] or 0)],
+        ['Camiones Recibidos', str(weekly_report['total_trucks_received'] or 0)],
+        ['Camiones Despachados', str(weekly_report['total_trucks_dispatched'] or 0)],
+        ['Calidad Promedio', f"{weekly_report['avg_quality']:.2f}" if weekly_report['avg_quality'] else "0.00"],
+        ['Total Incidentes', str(weekly_report['total_incidents'] or 0)],
+        ['Días con Registro', str(weekly_report['total_work_logs'] or 0)],
+    ]
+    weekly_table = Table(weekly_data, colWidths=[3*inch, 2*inch])
+    weekly_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e4a72')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+    ]))
+    elements.append(weekly_table)
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # Reporte Mensual
+    elements.append(Paragraph("Reporte Mensual (30 días)", heading_style))
+    monthly_data = [
+        ['Métrica', 'Valor'],
+        ['Total Paquetes', str(monthly_report['total_packages'] or 0)],
+        ['Camiones Recibidos', str(monthly_report['total_trucks_received'] or 0)],
+        ['Camiones Despachados', str(monthly_report['total_trucks_dispatched'] or 0)],
+        ['Calidad Promedio', f"{monthly_report['avg_quality']:.2f}" if monthly_report['avg_quality'] else "0.00"],
+        ['Total Incidentes', str(monthly_report['total_incidents'] or 0)],
+        ['Días con Registro', str(monthly_report['total_work_logs'] or 0)],
+    ]
+    monthly_table = Table(monthly_data, colWidths=[3*inch, 2*inch])
+    monthly_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+    ]))
+    elements.append(monthly_table)
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # Rendimiento por Empleado
+    elements.append(Paragraph("Rendimiento por Empleado (7 días)", heading_style))
+    if employee_performance:
+        employee_data = [['Empleado', 'Posición', 'Prom. Paquetes/Día', 'Calidad Prom.', 'Incidentes', 'Días Trabajados']]
+        for data in employee_performance:
+            employee = data['employee']
+            perf = data['performance']
+            position_name = employee.position.name if employee.position else "Sin posición"
+            employee_data.append([
+                employee.user.full_name,
+                position_name,
+                f"{perf['avg_packages']:.1f}" if perf['avg_packages'] else "0.0",
+                f"{perf['avg_quality']:.2f}" if perf['avg_quality'] else "0.00",
+                str(perf['total_incidents'] or 0),
+                str(perf['days_worked'] or 0),
+            ])
+        
+        employee_table = Table(employee_data, colWidths=[1.5*inch, 1.2*inch, 1*inch, 1*inch, 0.8*inch, 1*inch])
+        employee_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2d3748')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ]))
+        elements.append(employee_table)
+    else:
+        elements.append(Paragraph("No hay datos de rendimiento disponibles", styles['Normal']))
+    
+    # Construir PDF
+    doc.build(elements)
+    
+    # Obtener el valor del buffer y crear la respuesta
+    buffer.seek(0)
+    response = HttpResponse(buffer.read(), content_type='application/pdf')
+    filename = f"reporte_equipo_{request.user.username}_{today.strftime('%Y%m%d')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
 
 
 @login_required

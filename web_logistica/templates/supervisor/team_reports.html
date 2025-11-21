@@ -131,9 +131,14 @@
             <h1 class="page-title">Reportes del Equipo</h1>
             <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Análisis de rendimiento del equipo</p>
         </div>
-        <a href="{% url 'supervisor_dashboard' %}" class="back-button">
-            <i class="fas fa-arrow-left"></i> Volver al Dashboard
-        </a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="{% url 'supervisor_team_reports_pdf' %}" class="back-button" style="background: rgba(255, 255, 255, 0.3);">
+                <i class="fas fa-file-pdf"></i> Descargar PDF
+            </a>
+            <a href="{% url 'supervisor_dashboard' %}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+        </div>
     </div>
     
     <div class="reports-grid">

@@ -226,7 +226,7 @@ def supervisor_dashboard(request):
     # Empleados bajo supervisión con información de estado
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
-    ).select_related('user', 'position')
+    ).select_related('user')
     
     # Agregar información de estado y rendimiento a cada empleado
     employees_with_status = []
@@ -402,7 +402,6 @@ def employee_dashboard(request):
             employee = Employee.objects.create(
                 user=request.user,
                 employee_id=f"EMP{request.user.id:04d}",
-                position=None,
                 hire_date=date.today(),
                 supervisor=None
             )
@@ -508,7 +507,7 @@ def admin_employees_list(request):
     
     # Obtener todos los empleados con información relacionada
     all_employees = Employee.objects.select_related(
-        'user', 'position', 'supervisor'
+        'user', 'supervisor'
     ).order_by('user__first_name', 'user__last_name')
     
     # Filtros
@@ -778,7 +777,7 @@ def supervisor_employees_list(request):
     
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
-    ).select_related('user', 'position').order_by('user__first_name', 'user__last_name')
+    ).select_related('user').order_by('user__first_name', 'user__last_name')
     
     # Estadísticas por empleado
     today = datetime.now().date()
@@ -830,7 +829,7 @@ def supervisor_team_reports(request):
     # Empleados supervisados
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
-    ).select_related('user', 'position')
+    ).select_related('user')
     
     # Reporte semanal
     weekly_report = DailyWorkLog.objects.filter(
@@ -904,7 +903,7 @@ def supervisor_team_reports_pdf(request):
     # Empleados supervisados
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
-    ).select_related('user', 'position')
+    ).select_related('user')
     
     # Reporte semanal
     weekly_report = DailyWorkLog.objects.filter(
@@ -1039,21 +1038,19 @@ def supervisor_team_reports_pdf(request):
     # Rendimiento por Empleado
     elements.append(Paragraph("Rendimiento por Empleado (7 días)", heading_style))
     if employee_performance:
-        employee_data = [['Empleado', 'Posición', 'Prom. Paquetes/Día', 'Calidad Prom.', 'Incidentes', 'Días Trabajados']]
+        employee_data = [['Empleado', 'Prom. Paquetes/Día', 'Calidad Prom.', 'Incidentes', 'Días Trabajados']]
         for data in employee_performance:
             employee = data['employee']
             perf = data['performance']
-            position_name = employee.position.name if employee.position else "Sin posición"
             employee_data.append([
                 employee.user.full_name,
-                position_name,
                 f"{perf['avg_packages']:.1f}" if perf['avg_packages'] else "0.0",
                 f"{perf['avg_quality']:.2f}" if perf['avg_quality'] else "0.00",
                 str(perf['total_incidents'] or 0),
                 str(perf['days_worked'] or 0),
             ])
         
-        employee_table = Table(employee_data, colWidths=[1.5*inch, 1.2*inch, 1*inch, 1*inch, 0.8*inch, 1*inch])
+        employee_table = Table(employee_data, colWidths=[2*inch, 1.2*inch, 1.2*inch, 1*inch, 1.1*inch])
         employee_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2d3748')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -1091,7 +1088,7 @@ def supervisor_evaluate_performance(request, employee_id=None):
     
     supervised_employees = Employee.objects.filter(
         supervisor=request.user
-    ).select_related('user', 'position')
+    ).select_related('user')
     
     employee = None
     if employee_id:

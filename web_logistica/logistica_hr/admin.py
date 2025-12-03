@@ -7,7 +7,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from logistica_hr.users.models import User
-from logistica_hr.employees.models import Department, Position, Employee, WorkSchedule
+from logistica_hr.employees.models import Department, Employee, WorkSchedule
 from logistica_hr.tasks.models import TaskCategory, Task, TaskTimeLog, TaskComment
 from logistica_hr.performance.models import (
     PerformanceMetric, EmployeePerformance, DailyWorkLog, PerformanceEvaluation
@@ -52,30 +52,19 @@ class DepartmentAdmin(admin.ModelAdmin):
     ordering = ['name']
 
 
-@admin.register(Position)
-class PositionAdmin(admin.ModelAdmin):
-    """
-    Admin para el modelo Position
-    """
-    list_display = ['name', 'department', 'base_salary', 'is_active']
-    list_filter = ['department', 'is_active']
-    search_fields = ['name', 'description']
-    ordering = ['department', 'name']
-
-
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     """
     Admin para el modelo Employee
     """
     list_display = [
-        'employee_id', 'user', 'position', 'supervisor',
+        'employee_id', 'user', 'supervisor',
         'hire_date', 'is_active'
     ]
-    list_filter = ['position__department', 'is_active', 'hire_date']
+    list_filter = ['is_active', 'hire_date']
     search_fields = ['employee_id', 'user__username', 'user__first_name', 'user__last_name']
     ordering = ['employee_id']
-    raw_id_fields = ['user', 'position', 'supervisor']
+    raw_id_fields = ['user', 'supervisor']
 
 
 @admin.register(WorkSchedule)
@@ -84,7 +73,7 @@ class WorkScheduleAdmin(admin.ModelAdmin):
     Admin para el modelo WorkSchedule
     """
     list_display = ['employee', 'day_of_week', 'start_time', 'end_time', 'total_hours']
-    list_filter = ['day_of_week', 'employee__position__department']
+    list_filter = ['day_of_week']
     search_fields = ['employee__user__first_name', 'employee__user__last_name']
     ordering = ['employee', 'day_of_week']
 
@@ -109,7 +98,7 @@ class TaskAdmin(admin.ModelAdmin):
         'title', 'assigned_to', 'status', 'priority', 'due_date',
         'estimated_hours', 'actual_hours', 'is_overdue'
     ]
-    list_filter = ['status', 'priority', 'category', 'assigned_to__position__department']
+    list_filter = ['status', 'priority', 'category']
     search_fields = ['title', 'description', 'assigned_to__user__first_name']
     ordering = ['-due_date', 'priority']
     raw_id_fields = ['assigned_to', 'assigned_by']
@@ -122,7 +111,7 @@ class TaskTimeLogAdmin(admin.ModelAdmin):
     Admin para el modelo TaskTimeLog
     """
     list_display = ['task', 'employee', 'start_time', 'end_time', 'duration_hours', 'is_break']
-    list_filter = ['is_break', 'start_time__date', 'employee__position__department']
+    list_filter = ['is_break', 'start_time__date']
     search_fields = ['task__title', 'employee__user__first_name']
     ordering = ['-start_time']
     raw_id_fields = ['task', 'employee']
@@ -160,7 +149,7 @@ class EmployeePerformanceAdmin(admin.ModelAdmin):
         'employee', 'metric', 'date', 'actual_value',
         'performance_score', 'is_above_target'
     ]
-    list_filter = ['metric__metric_type', 'date', 'employee__position__department']
+    list_filter = ['metric__metric_type', 'date']
     search_fields = ['employee__user__first_name', 'metric__name']
     ordering = ['-date', 'employee']
     raw_id_fields = ['employee', 'metric', 'evaluated_by']
@@ -176,7 +165,7 @@ class DailyWorkLogAdmin(admin.ModelAdmin):
         'employee', 'date', 'start_time', 'end_time',
         'packages_processed', 'trucks_received', 'productivity_score'
     ]
-    list_filter = ['date', 'employee__position__department']
+    list_filter = ['date']
     search_fields = ['employee__user__first_name', 'notes']
     ordering = ['-date', 'employee']
     raw_id_fields = ['employee']

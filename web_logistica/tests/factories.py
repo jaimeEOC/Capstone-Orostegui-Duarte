@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import factory
 from django.contrib.auth import get_user_model
 
-from logistica_hr.employees.models import Department, Employee, Position, WorkSchedule
+from logistica_hr.employees.models import Department, Employee, WorkSchedule
 from logistica_hr.performance.models import (
     DailyWorkLog,
     EmployeePerformance,
@@ -75,20 +75,6 @@ class DepartmentFactory(factory.django.DjangoModelFactory):
     manager = factory.SubFactory(SupervisorUserFactory)
 
 
-class PositionFactory(factory.django.DjangoModelFactory):
-    """Factory para crear posiciones"""
-
-    class Meta:
-        model = Position
-
-    name = factory.Faker("job")
-    description = factory.Faker("text", max_nb_chars=200)
-    department = factory.SubFactory(DepartmentFactory)
-    base_salary = factory.Faker(
-        "pydecimal", left_digits=5, right_digits=2, positive=True
-    )
-
-
 class EmployeeFactory(factory.django.DjangoModelFactory):
     """Factory para crear empleados"""
 
@@ -97,7 +83,6 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
 
     user = factory.SubFactory(EmployeeUserFactory)
     employee_id = factory.Sequence(lambda n: f"EMP{n:04d}")
-    position = factory.SubFactory(PositionFactory)
     hire_date = factory.Faker("date_this_year")
     supervisor = factory.SubFactory(SupervisorUserFactory)
     emergency_contact = factory.Faker("name")

@@ -6,10 +6,10 @@ import pytest
 from datetime import date, timedelta
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from logistica_hr.employees.models import Department, Position, Employee
+from logistica_hr.employees.models import Department, Employee
 from logistica_hr.users.models import User
 from tests.factories import (
-    DepartmentFactory, PositionFactory, EmployeeFactory,
+    DepartmentFactory, EmployeeFactory,
     AdminUserFactory, SupervisorUserFactory, EmployeeUserFactory
 )
 
@@ -65,52 +65,6 @@ class TestDepartmentModel:
 
 @pytest.mark.django_db
 @pytest.mark.models
-class TestPositionModel:
-    """Pruebas para el modelo Position"""
-
-    def test_position_creation(self):
-        """Probar creación básica de posición"""
-        position = PositionFactory()
-        assert position.pk is not None
-        assert position.name is not None
-        assert position.department is not None
-
-    def test_position_str_representation(self):
-        """Probar representación string de la posición"""
-        dept = DepartmentFactory(name='Logística')
-        position = PositionFactory(name='Operador', department=dept)
-        expected = 'Operador - Logística'
-        assert str(position) == expected
-
-    def test_position_department_required(self):
-        """Probar que el departamento es requerido"""
-        with pytest.raises(IntegrityError):
-            PositionFactory(department=None)
-
-    def test_position_base_salary_optional(self):
-        """Probar que base_salary es opcional"""
-        position = PositionFactory(base_salary=None)
-        assert position.base_salary is None
-
-    def test_position_base_salary_positive(self):
-        """Probar que base_salary puede ser positivo"""
-        position = PositionFactory(base_salary=50000.00)
-        assert position.base_salary == 50000.00
-
-    def test_position_ordering(self):
-        """Probar ordenamiento por nombre"""
-        pos1 = PositionFactory(name='Zulu Position')
-        pos2 = PositionFactory(name='Alpha Position')
-        pos3 = PositionFactory(name='Beta Position')
-        
-        positions = Position.objects.all().order_by('name')
-        assert positions[0].name == 'Alpha Position'
-        assert positions[1].name == 'Beta Position'
-        assert positions[2].name == 'Zulu Position'
-
-
-@pytest.mark.django_db
-@pytest.mark.models
 class TestEmployeeModel:
     """Pruebas para el modelo Employee"""
 
@@ -144,27 +98,10 @@ class TestEmployeeModel:
         with pytest.raises(IntegrityError):
             EmployeeFactory(user=user)
 
-    def test_employee_position_optional(self):
-        """Probar que la posición es opcional"""
-        employee = EmployeeFactory(position=None)
-        assert employee.position is None
-
     def test_employee_supervisor_optional(self):
         """Probar que el supervisor es opcional"""
         employee = EmployeeFactory(supervisor=None)
         assert employee.supervisor is None
-
-    def test_employee_department_property(self):
-        """Probar propiedad department"""
-        dept = DepartmentFactory()
-        position = PositionFactory(department=dept)
-        employee = EmployeeFactory(position=position)
-        assert employee.department == dept
-
-    def test_employee_department_property_no_position(self):
-        """Probar propiedad department cuando no hay posición"""
-        employee = EmployeeFactory(position=None)
-        assert employee.department is None
 
     def test_employee_years_of_service(self):
         """Probar cálculo de años de servicio"""
@@ -253,13 +190,6 @@ class TestEmployeeModelRelationships:
         employee = EmployeeFactory(supervisor=supervisor)
         assert employee.supervisor == supervisor
         assert employee in supervisor.supervised_employees.all()
-
-    def test_employee_position_relationship(self):
-        """Probar relación con posición"""
-        position = PositionFactory()
-        employee = EmployeeFactory(position=position)
-        assert employee.position == position
-        assert employee in position.employees.all()
 
     def test_employee_user_relationship(self):
         """Probar relación con usuario"""

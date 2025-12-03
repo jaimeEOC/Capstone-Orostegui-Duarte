@@ -159,11 +159,7 @@
                 <div>
                     <h3 class="employee-name">{{ data.employee.user.full_name }}</h3>
                     <div class="employee-position">
-                        {% if data.employee.position %}
-                            {{ data.employee.position.name }} - {{ data.employee.position.department.name }}
-                        {% else %}
-                            Sin posición asignada
-                        {% endif %}
+                        ID: {{ data.employee.employee_id }}
                     </div>
                 </div>
             </div>

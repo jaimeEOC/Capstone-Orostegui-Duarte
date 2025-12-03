@@ -167,16 +167,6 @@
                 <span class="info-value">{{ employee.employee_id }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Posición:</span>
-                <span class="info-value">
-                    {% if employee.position %}
-                        {{ employee.position.name }}
-                    {% else %}
-                        Sin posición asignada
-                    {% endif %}
-                </span>
-            </div>
-            <div class="info-row">
                 <span class="info-label">Supervisor Actual:</span>
                 <span class="info-value">
                     {% if employee.supervisor %}

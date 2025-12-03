@@ -41,42 +41,6 @@ class Department(BaseModel):
         return self.name
 
 
-class Position(BaseModel):
-    """
-    Modelo para posiciones/cargos de empleados
-    """
-    name = models.CharField(
-        max_length=100,
-        verbose_name=_('Nombre')
-    )
-    department = models.ForeignKey(
-        Department,
-        on_delete=models.CASCADE,
-        related_name='positions',
-        verbose_name=_('Departamento')
-    )
-    description = models.TextField(
-        blank=True,
-        verbose_name=_('Descripción')
-    )
-    base_salary = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        verbose_name=_('Salario Base')
-    )
-
-    class Meta:
-        verbose_name = _('Posición')
-        verbose_name_plural = _('Posiciones')
-        unique_together = ['name', 'department']
-        ordering = ['department', 'name']
-
-    def __str__(self):
-        return f"{self.name} - {self.department.name}"
-
-
 class Employee(BaseModel):
     """
     Modelo principal para empleados
@@ -91,14 +55,6 @@ class Employee(BaseModel):
         max_length=20,
         unique=True,
         verbose_name=_('ID de Empleado')
-    )
-    position = models.ForeignKey(
-        Position,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='employees',
-        verbose_name=_('Posición')
     )
     hire_date = models.DateField(
         verbose_name=_('Fecha de Contratación')
@@ -139,10 +95,6 @@ class Employee(BaseModel):
 
     def __str__(self):
         return f"{self.user.get_full_name()} ({self.employee_id})"
-
-    @property
-    def department(self):
-        return self.position.department if self.position else None
 
     @property
     def years_of_service(self):

@@ -12,10 +12,9 @@ from tests.factories import (
     EmployeeFactory,
     EmployeePerformanceFactory,
     PerformanceMetricFactory,
-    PositionFactory,
 )
 
-from logistica_hr.employees.models import Department, Employee, Position
+from logistica_hr.employees.models import Department, Employee
 from logistica_hr.performance.models import (
     DailyWorkLog,
     EmployeePerformance,
@@ -60,34 +59,6 @@ class TestEmployeeCalculations:
 
         # Debería retornar 0 o número negativo
         assert employee.years_of_service <= 0
-
-    def test_employee_department_from_position(self):
-        """Probar que el departamento se obtiene de la posición"""
-        department = DepartmentFactory(name="Logística")
-        position = PositionFactory(department=department, name="Operador")
-        employee = EmployeeFactory(position=position)
-
-        assert employee.department == department
-        assert employee.department.name == "Logística"
-
-    def test_employee_department_none_when_no_position(self):
-        """Probar que el departamento es None cuando no hay posición"""
-        employee = EmployeeFactory(position=None)
-
-        assert employee.department is None
-
-    def test_employee_department_none_when_position_deleted(self):
-        """Probar que el departamento es None cuando la posición se elimina"""
-        department = DepartmentFactory(name="Logística")
-        position = PositionFactory(department=department, name="Operador")
-        employee = EmployeeFactory(position=position)
-
-        # Eliminar la posición
-        position.delete()
-        employee.refresh_from_db()
-
-        assert employee.department is None
-
 
 @pytest.mark.django_db
 @pytest.mark.business_logic

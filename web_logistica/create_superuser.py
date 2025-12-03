@@ -7,7 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'logistica_hr.settings.developme
 django.setup()
 
 from django.contrib.auth import get_user_model
-from logistica_hr.employees.models import Department, Position, Employee
+from logistica_hr.employees.models import Department, Employee
 
 User = get_user_model()
 
@@ -67,10 +67,10 @@ def create_users():
         print("ℹ️  El empleado 'empleado' ya existe")
     
     # Crear departamentos de prueba
-    create_departments_and_positions(admin_user, supervisor_user, empleado_user)
+    create_departments_and_employees(admin_user, supervisor_user, empleado_user)
 
-def create_departments_and_positions(admin_user, supervisor_user, empleado_user):
-    """Crear departamentos y posiciones de prueba"""
+def create_departments_and_employees(admin_user, supervisor_user, empleado_user):
+    """Crear departamentos y perfiles de empleados"""
     
     # Crear departamento de Logística
     dept_logistica, created = Department.objects.get_or_create(
@@ -94,33 +94,10 @@ def create_departments_and_positions(admin_user, supervisor_user, empleado_user)
     if created:
         print("✅ Departamento 'Recursos Humanos' creado")
     
-    # Crear posiciones
-    pos_supervisor, created = Position.objects.get_or_create(
-        name='Supervisor de Logística',
-        department=dept_logistica,
-        defaults={
-            'description': 'Supervisor encargado del equipo de logística',
-            'base_salary': 800000
-        }
-    )
-    if created:
-        print("✅ Posición 'Supervisor de Logística' creada")
-    
-    pos_operario, created = Position.objects.get_or_create(
-        name='Operario de Almacén',
-        department=dept_logistica,
-        defaults={
-            'description': 'Operario encargado del manejo de paquetes y camiones',
-            'base_salary': 500000
-        }
-    )
-    if created:
-        print("✅ Posición 'Operario de Almacén' creada")
-    
     # Crear perfiles de empleados
-    create_employee_profiles(supervisor_user, empleado_user, pos_supervisor, pos_operario)
+    create_employee_profiles(supervisor_user, empleado_user)
 
-def create_employee_profiles(supervisor_user, empleado_user, pos_supervisor, pos_operario):
+def create_employee_profiles(supervisor_user, empleado_user):
     """Crear perfiles de empleados"""
     
     # Perfil del supervisor
@@ -128,7 +105,6 @@ def create_employee_profiles(supervisor_user, empleado_user, pos_supervisor, pos
         Employee.objects.create(
             user=supervisor_user,
             employee_id='SUP001',
-            position=pos_supervisor,
             hire_date='2024-01-15',
             emergency_contact='Ana Supervisor',
             emergency_phone='+56911111111',
@@ -142,7 +118,6 @@ def create_employee_profiles(supervisor_user, empleado_user, pos_supervisor, pos
         Employee.objects.create(
             user=empleado_user,
             employee_id='EMP001',
-            position=pos_operario,
             hire_date='2024-02-01',
             supervisor=supervisor_user,
             emergency_contact='Juan Empleado',

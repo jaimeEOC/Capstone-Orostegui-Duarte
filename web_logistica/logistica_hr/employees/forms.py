@@ -3,7 +3,7 @@ Formularios para la aplicación employees
 """
 
 from django import forms
-from .models import Employee, Position
+from .models import Employee
 
 
 class EmployeeEditForm(forms.ModelForm):

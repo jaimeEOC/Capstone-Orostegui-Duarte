@@ -330,11 +330,7 @@
                 <div class="employee-info">
                     <h3 class="employee-name">{{ data.employee.user.full_name }}</h3>
                     <div class="employee-position">
-                        {% if data.employee.position %}
-                            {{ data.employee.position.name }}
-                        {% else %}
-                            Sin posición asignada
-                        {% endif %}
+                        ID: {{ data.employee.employee_id }}
                     </div>
                     <div class="employee-supervisor">
                         {% if data.employee.supervisor %}

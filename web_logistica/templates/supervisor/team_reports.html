@@ -216,13 +216,7 @@
                 <tr>
                     <td>
                         <strong>{{ data.employee.user.full_name }}</strong><br>
-                        <small style="color: #718096;">
-                            {% if data.employee.position %}
-                                {{ data.employee.position.name }}
-                            {% else %}
-                                Sin posición
-                            {% endif %}
-                        </small>
+                        <small style="color: #718096;">ID: {{ data.employee.employee_id }}</small>
                     </td>
                     <td>{{ data.performance.avg_packages|floatformat:1|default:"0" }}</td>
                     <td>{{ data.performance.avg_quality|floatformat:2|default:"0" }}</td>

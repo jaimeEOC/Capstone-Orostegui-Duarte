@@ -480,11 +480,7 @@
                         <div class="employee-info" style="flex: 1;">
                             <div class="employee-name">{{ data.employee.user.full_name }}</div>
                             <div class="employee-position">
-                                {% if data.employee.position %}
-                                    {{ data.employee.position.name }} - {{ data.employee.position.department.name }}
-                                {% else %}
-                                    Sin posición asignada
-                                {% endif %}
+                                ID: {{ data.employee.employee_id }}
                             </div>
                             {% if data.week_performance.avg_packages %}
                             <div style="font-size: 0.8rem; color: #718096; margin-top: 0.25rem;">

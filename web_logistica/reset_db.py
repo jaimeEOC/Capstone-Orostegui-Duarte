@@ -7,7 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'logistica_hr.settings.developme
 django.setup()
 
 from django.contrib.auth import get_user_model
-from logistica_hr.employees.models import Department, Position, Employee
+from logistica_hr.employees.models import Department, Employee
 
 User = get_user_model()
 
@@ -23,10 +23,6 @@ def reset_database():
     # Eliminar todos los empleados
     Employee.objects.all().delete()
     print("✅ Empleados eliminados")
-    
-    # Eliminar todas las posiciones
-    Position.objects.all().delete()
-    print("✅ Posiciones eliminadas")
     
     # Eliminar todos los departamentos
     Department.objects.all().delete()
@@ -89,28 +85,10 @@ def reset_database():
     )
     print("✅ Departamento 'Recursos Humanos' creado")
     
-    # Crear posiciones
-    pos_supervisor = Position.objects.create(
-        name='Supervisor de Logística',
-        department=dept_logistica,
-        description='Supervisor encargado del equipo de logística',
-        base_salary=800000
-    )
-    print("✅ Posición 'Supervisor de Logística' creada")
-    
-    pos_operario = Position.objects.create(
-        name='Operario de Almacén',
-        department=dept_logistica,
-        description='Operario encargado del manejo de paquetes y camiones',
-        base_salary=500000
-    )
-    print("✅ Posición 'Operario de Almacén' creada")
-    
     # Crear perfiles de empleados
     Employee.objects.create(
         user=supervisor_user,
         employee_id='SUP001',
-        position=pos_supervisor,
         hire_date='2024-01-15',
         emergency_contact='Ana Supervisor',
         emergency_phone='+56911111111',
@@ -122,7 +100,6 @@ def reset_database():
     Employee.objects.create(
         user=empleado_user,
         employee_id='EMP001',
-        position=pos_operario,
         hire_date='2024-02-01',
         supervisor=supervisor_user,
         emergency_contact='Juan Empleado',

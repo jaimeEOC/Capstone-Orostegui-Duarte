@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registrar Trabajo - Logistica HR{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #1e4a72 0%, #3b82f6 100%);
+    color: #fff;
+    padding: 1.8rem 2rem;
+    border-radius: 15px;
+    margin: 0 0 1.5rem 0;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+  }
+
+  .breadcrumbs a {
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: none;
+  }
+
+  .breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+
+  .content-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 0 0 1.5rem 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .form-help {
+    color: #6b7280;
+    font-size: .9rem;
+  }
+
+  .form-section {
+    background: #f7fafc;
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <!-- Encabezado -->
+  <div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="h3 m-0">
+          <i class="fas fa-clock me-2"></i>
+          {% if work_log %}Editar Registro de Trabajo{% else %}Registrar Trabajo Diario{% endif %}
+        </h1>
+        <div class="breadcrumbs small mt-1">
+          <a href="{% url 'home' %}"><i class="fas fa-home"></i> Dashboard</a>
+          <span class="mx-1">›</span>
+          <a href="{% url 'employee_dashboard' %}">Mi Dashboard</a>
+          <span class="mx-1">›</span>
+          <span>Registrar Trabajo</span>
+        </div>
+      </div>
+      <div>
+        <a href="{% url 'employee_dashboard' %}" class="btn btn-outline-light">
+          <i class="fas fa-arrow-left me-1"></i> Volver al Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="content-card">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} mb-3">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if form.errors or form.non_field_errors %}
+      <div class="alert alert-danger mb-3">
+        ❌ Hay errores en el formulario. Revísalos por favor.
+      </div>
+    {% endif %}
+
+    {% if work_log %}
+      <div class="alert alert-info mb-3">
+        <i class="fas fa-info-circle"></i>
+        Ya existe un registro para {{ work_log.date|date:"d/m/Y" }}. Puedes editarlo o actualizar la información.
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- Información básica -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="fas fa-calendar-alt me-2"></i>Información Básica
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">{{ form.date.label }}</label>
+            {{ form.date }}
+            {% for e in form.date.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <label class="form-label">Hora de Inicio</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small text-muted">{{ form.start_hour.label }}</label>
+                {{ form.start_hour }}
+                {% for e in form.start_hour.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small text-muted">{{ form.start_minute.label }}</label>
+                {{ form.start_minute }}
+                {% for e in form.start_minute.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+            <div class="form-help mt-1">
+              Formato 24 horas (ej: 08 horas, 00 minutos = 8:00 AM)
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Hora de Fin</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small text-muted">{{ form.end_hour.label }}</label>
+                {{ form.end_hour }}
+                {% for e in form.end_hour.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small text-muted">{{ form.end_minute.label }}</label>
+                {{ form.end_minute }}
+                {% for e in form.end_minute.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+            <div class="form-help mt-1">
+              Formato 24 horas (ej: 17 horas, 30 minutos = 5:30 PM)
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <label class="form-label">
+              Tiempo de Descanso <span class="text-muted small">(opcional)</span>
+            </label>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label small text-muted">{{ form.break_hours.label }}</label>
+                {{ form.break_hours }}
+                {% for e in form.break_hours.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-6">
+                <label class="form-label small text-muted">{{ form.break_minutes.label }}</label>
+                {{ form.break_minutes }}
+                {% for e in form.break_minutes.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+            <div class="form-help mt-1">
+              Ejemplo: 1 hora y 30 minutos = 1 en horas, 30 en minutos
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas de trabajo -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="fas fa-chart-line me-2"></i>Métricas de Trabajo
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">{{ form.packages_processed.label }}</label>
+            {{ form.packages_processed }}
+            {% for e in form.packages_processed.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">{{ form.trucks_received.label }}</label>
+            {{ form.trucks_received }}
+            {% for e in form.trucks_received.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">{{ form.trucks_dispatched.label }}</label>
+            {{ form.trucks_dispatched }}
+            {% for e in form.trucks_dispatched.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Calidad y seguridad -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="fas fa-star me-2"></i>Calidad y Seguridad
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">{{ form.quality_score.label }}</label>
+            {{ form.quality_score }}
+            <div class="form-help">
+              {{ form.quality_score.help_text|default:"Puntaje entre 0.0 y 7.0" }}
+            </div>
+            {% for e in form.quality_score.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">{{ form.safety_incidents.label }}</label>
+            {{ form.safety_incidents }}
+            {% for e in form.safety_incidents.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Notas -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="fas fa-sticky-note me-2"></i>Notas Adicionales
+        </div>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">{{ form.notes.label }}</label>
+            {{ form.notes }}
+            {% for e in form.notes.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <a href="{% url 'employee_dashboard' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i> Cancelar
+        </a>
+        <button class="btn btn-primary" type="submit">
+          <i class="fas fa-save me-1"></i> Guardar Registro
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Añade clases Bootstrap si tu ModelForm no las incluye por widget
+(function(){
+  const form = document.querySelector('form[method="post"]');
+  if(!form) return;
+
+  form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea')
+      .forEach(el => el.classList.add('form-control'));
+  form.querySelectorAll('select').forEach(el => el.classList.add('form-select'));
+})();
+</script>
+{% endblock %}

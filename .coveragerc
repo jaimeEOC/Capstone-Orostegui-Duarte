@@ -1,0 +1,56 @@
+[run]
+# Archivos a incluir en el reporte de cobertura
+source = logistica_hr
+
+# Archivos a omitir del reporte
+omit = 
+    */migrations/*
+    */venv/*
+    */tests/*
+    */__pycache__/*
+    */settings.py
+    */settings_sqlite.py
+    */wsgi.py
+    */asgi.py
+    */celery.py
+    */manage.py
+    */create_superuser.py
+    */reset_db.py
+
+[report]
+# Excluir líneas del reporte
+exclude_lines =
+    # Tiene que ser una regex para que funcione
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+
+# Precisión de los porcentajes
+precision = 2
+
+# Ordenar por cobertura
+sort = Cover
+
+# Mostrar archivos con 100% de cobertura
+skip_covered = False
+
+# Mostrar líneas faltantes
+show_missing = True
+
+[html]
+# Directorio para reporte HTML
+directory = htmlcov
+
+# Título del reporte
+title = Logistica HR - Reporte de Cobertura
+
+[xml]
+# Archivo de salida para reporte XML
+output = coverage.xml
